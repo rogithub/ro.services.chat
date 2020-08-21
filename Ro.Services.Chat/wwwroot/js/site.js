@@ -1,4 +1,73 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿const urlBase = $("#urlBase").val();
+const urlHome = $("#urlHome").val();
 
-// Write your JavaScript code.
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl(`${urlBase}/chathub`)
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+async function start() {
+    try {
+        await connection.start();
+        console.log("connected");
+    } catch (err) {
+        console.log(err);
+        setTimeout(() => start(), 5000);
+    }
+};
+
+connection.onclose(async () => {
+    await start();
+});
+
+connection.on("ReceiveMessage", (user, message) => {
+    appendMsg(user, message, false);
+});
+
+function appendMsg(user, msg, isLocal) {
+    let row = $("<div class='row'></div>");
+    let col = $("<div class='col-12'></div>");
+    let p = isLocal ?
+        $(`<p class='alert alert-info text-right'>${msg}</p>`) :
+        $(`<p class='alert alert-info'>${user}>> ${msg}</p>`);
+
+    row.append(col);
+    col.append(p);
+
+
+    $("#mesagges").append(row);
+};
+
+async function send(user, msg) {
+    try {
+        connection.invoke("SendMessage", user, msg);
+    } catch (err) {
+        setTimeout(() => start(), 5000);
+    }
+};
+
+$(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const user = urlParams.get('user');
+
+    if ($.trim(user).length === 0) {
+        window.location.href = urlHome;
+        return;
+    }
+
+    start();
+    let txtMessage = $("#txtMsg");
+    txtMessage.focus();
+
+    $("#frmMsg").on("submit", (e) => {
+        e.preventDefault();
+
+        let msg = txtMessage.val();
+        if ($.trim(msg).length > 0) {
+            send(user, msg);
+            appendMsg(user, msg, true);
+        }
+        txtMessage.val("");
+        txtMessage.focus();
+    });
+});
