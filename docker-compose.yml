@@ -1,0 +1,15 @@
+version: "2"
+services:
+  chat_service:
+    image: chat_service
+    container_name: chat_service
+    build: .
+    environment:
+      - Kestrel__Certificates__Default__Path=/usr/local/share/ca-certificates/dot_net_core_cert.pfx
+      - Kestrel__Certificates__Default__Password=tupinchekola
+    ports:
+      - 5002:5002
+    volumes:
+      - /home/ro/Databases/Ro.Services.Chat/logs:/app/logs
+      - /home/ro/Databases/dotnetcore:/usr/local/share/ca-certificates
+    restart: unless-stopped
