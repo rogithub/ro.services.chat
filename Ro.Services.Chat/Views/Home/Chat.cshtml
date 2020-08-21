@@ -1,0 +1,46 @@
+﻿<header>
+    <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light">
+        <a class="navbar-brand" href="#">
+            Chat
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+            aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">                
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Usuarios</a>
+                </li>                
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index","Home")">Salir</a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+</header>
+
+<div id="mesagges">    
+    
+</div>
+
+<nav class="navbar fixed-bottom navbar-light bg-light">
+    <form id="frmMsg">    
+        <input type="text" id="txtMsg" class="form-control">            
+    </form>
+</nav>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+
+            if ($.trim(user).length === 0){
+                window.location.href = '@Url.Action("Index", "Home")';
+                return;
+            }
+        });
+    </script>
+}
