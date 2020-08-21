@@ -25,8 +25,9 @@ connection.on("ReceiveMessage", (user, message) => {
 });
 
 function appendMsg(user, msg, isLocal) {
+    let list = $("#mesagges");
     let row = $("<div class='row'></div>");
-    let col = $("<div class='col-12'></div>");
+    let col = $("<div class='col'></div>");
     let p = isLocal ?
         $(`<p class='alert alert-info text-right'>${msg}</p>`) :
         $(`<p class='alert alert-info'>${user}>> ${msg}</p>`);
@@ -34,8 +35,9 @@ function appendMsg(user, msg, isLocal) {
     row.append(col);
     col.append(p);
 
+    list.append(row);
 
-    $("#mesagges").append(row);
+    window.scrollTo(0, p.offset().top);
 };
 
 async function send(user, msg) {
@@ -61,13 +63,13 @@ $(() => {
 
     $("#frmMsg").on("submit", (e) => {
         e.preventDefault();
-
         let msg = txtMessage.val();
+        txtMessage.val("");
+        txtMessage.focus();
+
         if ($.trim(msg).length > 0) {
             send(user, msg);
             appendMsg(user, msg, true);
         }
-        txtMessage.val("");
-        txtMessage.focus();
     });
 });

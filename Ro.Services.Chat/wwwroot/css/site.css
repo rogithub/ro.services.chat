@@ -13,7 +13,6 @@ form#frmMsg {
 }
 
 div#mesagges {
-    margin-top: 55px;
-    position: fixed;
-    bottom: 55px;    
+    margin-top: 55px;    
+    margin-bottom: 55px;    
 }
