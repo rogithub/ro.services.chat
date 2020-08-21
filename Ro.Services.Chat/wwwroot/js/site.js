@@ -30,7 +30,7 @@ function appendMsg(user, msg, isLocal) {
     let col = $("<div class='col'></div>");
     let p = isLocal ?
         $(`<p class='alert alert-info text-right'>${msg}</p>`) :
-        $(`<p class='alert alert-info'>${user}>> ${msg}</p>`);
+        $(`<p class='alert alert-light'>${user}>> ${msg}</p>`);
 
     row.append(col);
     col.append(p);
