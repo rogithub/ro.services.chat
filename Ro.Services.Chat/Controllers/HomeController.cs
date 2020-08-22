@@ -12,26 +12,33 @@ namespace Ro.Services.Chat.Controllers
         private string[] FreeGroups { get; set; }
         private readonly ILogger<HomeController> _logger;
 
-        private  ConnectedUsers Users { get; set; }
+        private  ConnectedUsers ConnectedUsers { get; set; }
 
         public HomeController(
             ConnectedUsers users,
             ILogger<HomeController> logger,
             IConfiguration config)
         {
-            Users = users;
+            ConnectedUsers = users;
             _logger = logger;
             FreeGroups = config.GetSection("App:Groups").Get<string[]>();
         }
 
         public IActionResult Index()
         {
-            var counter = (from g in FreeGroups select string.Format("{0} ({1})", g, 
-            Users.Ids.Count(u=>u.Value.Group == g)));
-            return View(counter);            
+            var groups = (from g in FreeGroups select new { 
+                Name = g, 
+                Count = ConnectedUsers.Ids.Count(u=>u.Value.Group == g)}
+            );
+            return View(groups);            
         }
 
         public IActionResult Chat()
+        {
+            return View();
+        }
+
+        public IActionResult Users()
         {
             return View();
         }

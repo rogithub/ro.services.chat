@@ -9,9 +9,9 @@
         <div class="form-group">
             <label>Grupo:</label>            
             <select name="group" class="form-control" required>
-                @foreach (var group in Model)
+                @foreach (var g in Model)
                 {
-                    <option value="@group">@group</option>                    
+                    <option value="@g.Name">@string.Format("{0} ({1})", g.Name, g.Count)</option>                    
                 } 
             </select>            
         </div>        
