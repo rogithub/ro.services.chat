@@ -6,18 +6,19 @@ const connection = new signalR.HubConnectionBuilder()
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
-async function start() {
+async function start(user) {
     try {
-        await connection.start();
+        await connection.start(user);
+        setUserName(user);
         console.log("connected");
     } catch (err) {
         console.log(err);
-        setTimeout(() => start(), 5000);
+        setTimeout(() => start(user), 5000);
     }
 };
 
 connection.onclose(async () => {
-    await start();
+    await start(user);
 });
 
 connection.on("ReceiveMessage", (user, message) => {
@@ -48,6 +49,14 @@ async function send(user, msg) {
     }
 };
 
+async function setUserName(user) {
+    try {
+        connection.invoke("SetUserName", user);
+    } catch (err) {
+        setTimeout(() => start(), 5000);
+    }
+};
+
 $(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const user = urlParams.get('user');
@@ -57,7 +66,8 @@ $(() => {
         return;
     }
 
-    start();
+    start(user);
+
     let txtMessage = $("#txtMsg");
     txtMessage.focus();
 
