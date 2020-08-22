@@ -2,36 +2,40 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Ro.Services.Chat.Models;
 
 namespace Ro.Services.Chat.SignalRHubs
 {
     public class ChatHub : Hub
     {
-        public static class ConnectedUser
+        private ConnectedUsers Connected { get; set; }
+        public ChatHub(ConnectedUsers users)
         {
-            public static Dictionary<string, string> Ids = new Dictionary<string, string>();
+            this.Connected = users;
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            ConnectedUser.Ids.Remove(Context.ConnectionId);
+            Groups.RemoveFromGroupAsync(Context.ConnectionId, Connected.Ids[this.Context.ConnectionId].Group);
+            Connected.Ids.Remove(Context.ConnectionId);
             return base.OnDisconnectedAsync(exception);
         }
 
         public override Task OnConnectedAsync()
         {
-            ConnectedUser.Ids.Add(Context.ConnectionId, "");
+            Connected.Ids.Add(Context.ConnectionId, null);
             return base.OnConnectedAsync();
         }
 
-        public void SetUserName(string user)
+        public async Task SetInfo(UserInfo info)
         {
-            ConnectedUser.Ids[this.Context.ConnectionId] = user;
+            await Groups.AddToGroupAsync(Context.ConnectionId, info.Group);
+            Connected.Ids[this.Context.ConnectionId] = info;
         }
 
-        public async Task SendMessage(string user, string message)
+        public async Task SendMessage(UserInfo info, string message)
         {
-            await Clients.Others.SendAsync("ReceiveMessage", user, message);
+            await Clients.OthersInGroup(info.Group).SendAsync("ReceiveMessage", info.Name, message);
         }
     }
 }

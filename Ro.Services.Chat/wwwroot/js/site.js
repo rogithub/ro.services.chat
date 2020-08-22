@@ -6,19 +6,20 @@ const connection = new signalR.HubConnectionBuilder()
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
-async function start(user) {
+async function start(info) {
     try {
-        await connection.start(user);
-        setUserName(user);
+        await connection.start(info);
+        setInfo(info);
         console.log("connected");
     } catch (err) {
         console.log(err);
-        setTimeout(() => start(user), 5000);
+        setTimeout(() => start(info), 5000);
     }
 };
 
 connection.onclose(async () => {
-    await start(user);
+    const info = getUserInfo();
+    await start(info);
 });
 
 connection.on("ReceiveMessage", (user, message) => {
@@ -41,32 +42,39 @@ function appendMsg(user, msg, isLocal) {
     window.scrollTo(0, p.offset().top);
 };
 
-async function send(user, msg) {
+async function send(info, msg) {
     try {
-        connection.invoke("SendMessage", user, msg);
+        connection.invoke("SendMessage", info, msg);
+    } catch (err) {
+        setTimeout(() => start(info), 5000);
+    }
+};
+
+async function setInfo(info) {
+    try {
+        connection.invoke("SetInfo", info);
     } catch (err) {
         setTimeout(() => start(), 5000);
     }
 };
 
-async function setUserName(user) {
-    try {
-        connection.invoke("SetUserName", user);
-    } catch (err) {
-        setTimeout(() => start(), 5000);
-    }
-};
-
-$(() => {
+function getUserInfo() {
     const urlParams = new URLSearchParams(window.location.search);
     const user = urlParams.get('user');
+    const group = urlParams.get('group');
+    const info = { name: user, group };
 
-    if ($.trim(user).length === 0) {
+    if ($.trim(user).length === 0 || $.trim(group).length === 0) {
         window.location.href = urlHome;
         return;
     }
+    return info;
+}
 
-    start(user);
+$(() => {
+    const info = getUserInfo();
+
+    start(info);
 
     let txtMessage = $("#txtMsg");
     txtMessage.focus();
@@ -78,8 +86,8 @@ $(() => {
         txtMessage.focus();
 
         if ($.trim(msg).length > 0) {
-            send(user, msg);
-            appendMsg(user, msg, true);
+            send(info, msg);
+            appendMsg(info.name, msg, true);
         }
     });
 });

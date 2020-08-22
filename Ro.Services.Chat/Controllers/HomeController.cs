@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ro.Services.Chat.Models;
 
@@ -11,16 +8,20 @@ namespace Ro.Services.Chat.Controllers
 {
     public class HomeController : Controller
     {
+        private string[] FreeGroups { get; set; }
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            ILogger<HomeController> logger,
+            IConfiguration config)
         {
             _logger = logger;
+            FreeGroups = config.GetSection("App:Groups").Get<string[]>();
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View(FreeGroups);
         }
 
         public IActionResult Chat()

@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Ro.Services.Chat.Models;
 using Ro.Services.Chat.SignalRHubs;
+using Serilog;
 
 namespace Ro.Services.Chat
 {
@@ -24,7 +26,16 @@ namespace Ro.Services.Chat
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ILogger logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(this.Configuration)
+                .CreateLogger();
+
+            services.AddSingleton(logger);
+            services.AddSingleton<ConnectedUsers>();
             services.AddSignalR();
+
+
+
             services.AddControllersWithViews();
         }
 
