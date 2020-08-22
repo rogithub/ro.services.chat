@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Ro.Services.Chat.Models;
+using System.Linq;
 
 namespace Ro.Services.Chat.Controllers
 {
@@ -11,17 +12,23 @@ namespace Ro.Services.Chat.Controllers
         private string[] FreeGroups { get; set; }
         private readonly ILogger<HomeController> _logger;
 
+        private  ConnectedUsers Users { get; set; }
+
         public HomeController(
+            ConnectedUsers users,
             ILogger<HomeController> logger,
             IConfiguration config)
         {
+            Users = users;
             _logger = logger;
             FreeGroups = config.GetSection("App:Groups").Get<string[]>();
         }
 
         public IActionResult Index()
         {
-            return View(FreeGroups);
+            var counter = (from g in FreeGroups select string.Format("{0} ({1})", g, 
+            Users.Ids.Count(u=>u.Value.Group == g)));
+            return View(counter);            
         }
 
         public IActionResult Chat()
