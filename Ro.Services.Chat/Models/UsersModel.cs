@@ -3,6 +3,11 @@ using System.Collections.Generic;
 
 namespace Ro.Services.Chat.Models
 {
+    public class GroupInfo
+    {
+        public string Name { get; set; }
+        public int Count { get; set; }
+    }
     public class UserInfo
     {
         public string Name { get; set; }

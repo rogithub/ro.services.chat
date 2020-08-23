@@ -26,10 +26,10 @@ namespace Ro.Services.Chat.Controllers
 
         public IActionResult Index()
         {
-            var groups = (from g in FreeGroups select new { 
+            var groups = (from g in FreeGroups select new GroupInfo { 
                 Name = g, 
                 Count = ConnectedUsers.Ids.Count(u=>u.Value.Group == g)}
-            );
+            ).ToArray();
             return View(groups);            
         }
 
