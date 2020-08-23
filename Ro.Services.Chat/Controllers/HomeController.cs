@@ -29,7 +29,7 @@ namespace Ro.Services.Chat.Controllers
             var groups = (from g in FreeGroups select new GroupInfo { 
                 Name = g, 
                 Count = ConnectedUsers.Ids.Count(u=>u.Value.Group == g)}
-            ).ToArray();
+            );
             return View(groups);            
         }
 
