@@ -233,13 +233,14 @@ $(function () { return __awaiter(void 0, void 0, void 0, function () {
                 api = new jsonReq_1.JsonReq(urlBase, window);
                 model = new chatTemplates_1.ChatTemplates(ko, $, info, urlSignalr);
                 model.id.subscribe(function (id) { return __awaiter(void 0, void 0, void 0, function () {
-                    var users;
+                    var users, others;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
-                            case 0: return [4 /*yield*/, api.get("GetUsers?group=" + info.group)];
+                            case 0: return [4 /*yield*/, api.get("GetUsers?groupName=" + info.group)];
                             case 1:
                                 users = _a.sent();
-                                model.users(ko.utils.arrayFilter(users, function (u) { return u.id !== id; }));
+                                others = ko.utils.arrayFilter(users, function (u) { return u.id !== id; });
+                                model.users(others);
                                 return [2 /*return*/];
                         }
                     });
