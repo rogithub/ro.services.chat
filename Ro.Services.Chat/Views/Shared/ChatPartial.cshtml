@@ -1,0 +1,28 @@
+
+
+<script type="text/html" id="ChatPartial">
+    <div id="mesagges" class="container">        
+    <!-- ko foreach: messages() -->
+        <div class="row">
+            <div class="col">
+                <p class='alert' 
+                    data-bind="css:  { 
+                        'alert-info text-right': isLocal,
+                        'alert-light': !isLocal,
+                    }">                    
+                    <!-- ko if: !isLocal -->
+                    <strong data-bind="text: user.name"></strong>
+                    <!-- /ko -->
+                    <span data-bind="text: message"></span>
+                </p>                
+            </div>
+        </div>
+    <!-- /ko -->
+    </div>
+
+    <nav class="navbar fixed-bottom navbar-dark bg-dark">
+        <form id="frmMsg" data-bind="submit: sendMessage.bind($data)">    
+            <input type="text" id="txtMsg" class="form-control" data-bind="textInput: message" required maxlength="250">            
+        </form>
+    </nav>
+</script>
