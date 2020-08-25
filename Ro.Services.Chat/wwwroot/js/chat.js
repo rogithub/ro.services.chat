@@ -171,9 +171,16 @@ var ChatTemplates = /** @class */ (function () {
             self.messages.push({ user: user, message: message, isLocal: false });
             self.autoScroll();
         };
+        this.onUserListChange = function (list) {
+            var self = _this;
+            console.dir(list);
+            self.users(list);
+        };
         this.autoScroll = function () {
             var self = _this;
             var p = self.$("#mesagges p:last");
+            if (p.length === 0)
+                return;
             window.scrollTo(0, p.offset().top);
         };
         this.sendMessage = function () {
@@ -195,9 +202,10 @@ var ChatTemplates = /** @class */ (function () {
         this.current = ko.observable("ChatPartial");
         this.message = ko.observable("");
         this.messages = ko.observableArray([]);
+        this.users = ko.observableArray([]);
         $("#txtMsg").focus();
         var self = this;
-        this.chatConnection = new ChatConnection_1.ChatConnection(user, urlSignalr, self.onMessage);
+        this.chatConnection = new ChatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onUserListChange);
     }
     return ChatTemplates;
 }());
@@ -251,7 +259,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatConnection = void 0;
 var signalR = __webpack_require__(17);
 var ChatConnection = /** @class */ (function () {
-    function ChatConnection(user, urlSignalr, onMessage) {
+    function ChatConnection(user, urlSignalr, onMessage, onUserListChange) {
         var _this = this;
         this.send = function (msg) { return __awaiter(_this, void 0, void 0, function () {
             var self;
@@ -313,6 +321,7 @@ var ChatConnection = /** @class */ (function () {
             });
         }); });
         self.connection.on("ReceiveMessage", onMessage);
+        self.connection.on("UsersListChange", onUserListChange);
     }
     return ChatConnection;
 }());

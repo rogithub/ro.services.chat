@@ -1,4 +1,5 @@
 import { UserInfo } from '../models/userInfo';
+import { ChatUser } from '../models/chatUser';
 import { ChatConnection } from './ChatConnection';
 
 export interface MessageInfo {
@@ -16,6 +17,7 @@ export class ChatTemplates {
     public urlSignalr: string;
     public chatConnection: ChatConnection;
     public messages: KnockoutObservableArray<MessageInfo>;
+    public users: KnockoutObservableArray<ChatUser>;
 
     constructor(ko: KnockoutStatic, $: JQueryStatic, user: UserInfo, urlSignalr: string) {
         this.ko = ko;
@@ -25,9 +27,10 @@ export class ChatTemplates {
         this.current = ko.observable<string>("ChatPartial");
         this.message = ko.observable<string>("");
         this.messages = ko.observableArray<MessageInfo>([]);
+        this.users = ko.observableArray<ChatUser>([]);
         $("#txtMsg").focus();
         const self = this;
-        this.chatConnection = new ChatConnection(user, urlSignalr, self.onMessage);
+        this.chatConnection = new ChatConnection(user, urlSignalr, self.onMessage, self.onUserListChange);
     }
 
     public onMessage = (user: string, message: string) => {
@@ -36,9 +39,17 @@ export class ChatTemplates {
         self.autoScroll();
     }
 
+    public onUserListChange = (list: ChatUser[]) => {
+        const self = this;
+        console.dir(list);
+        self.users(list);
+    }
+
     public autoScroll = () => {
         const self = this;
         let p = self.$("#mesagges p:last");
+        if (p.length === 0) return;
+
         window.scrollTo(0, p.offset().top);
     }
 

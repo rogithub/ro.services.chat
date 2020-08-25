@@ -1,15 +1,15 @@
 
 
 <script type="text/html" id="ChatUsersPartial">
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
-    <h1>Chat Users goes here</h1>
+    <div id="users" class="container pagecontent">        
+    <!-- ko foreach: users() -->
+        <div class="row">
+            <div class="col">
+                <p>                    
+                  <span data-bind="text: name"></span>  
+                </p>                
+            </div>
+        </div>
+    <!-- /ko -->
+    </div>
 </script>

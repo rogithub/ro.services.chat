@@ -13,6 +13,13 @@ namespace Ro.Services.Chat.Models
         public string Name { get; set; }
         public string Group { get; set; }
     }
+
+    public class ChatUser
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+
     public class ConnectedUsers
     {
         public Dictionary<string, UserInfo> Ids = new Dictionary<string, UserInfo>();

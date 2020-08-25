@@ -12,7 +12,7 @@ form#frmMsg {
     width: 100%;
 }
 
-div#mesagges {
-    margin-top: 55px;    
-    margin-bottom: 55px;    
+.pagecontent {
+    margin-top: 60px;    
+    margin-bottom: 60px;    
 }

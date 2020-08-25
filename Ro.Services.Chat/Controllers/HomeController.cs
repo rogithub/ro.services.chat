@@ -12,7 +12,7 @@ namespace Ro.Services.Chat.Controllers
         private string[] FreeGroups { get; set; }
         private readonly ILogger<HomeController> _logger;
 
-        private  ConnectedUsers ConnectedUsers { get; set; }
+        private ConnectedUsers ConnectedUsers { get; set; }
 
         public HomeController(
             ConnectedUsers users,
@@ -26,11 +26,14 @@ namespace Ro.Services.Chat.Controllers
 
         public IActionResult Index()
         {
-            var groups = (from g in FreeGroups select new GroupInfo { 
-                Name = g, 
-                Count = ConnectedUsers.Ids.Count(u=>u.Value.Group == g)}
+            var groups = (from g in FreeGroups
+                          select new GroupInfo
+                          {
+                              Name = g,
+                              Count = ConnectedUsers.Ids.Count(u => u.Value.Group == g)
+                          }
             );
-            return View(groups);            
+            return View(groups);
         }
 
         public IActionResult Chat()

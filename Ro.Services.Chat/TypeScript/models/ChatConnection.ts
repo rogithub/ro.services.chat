@@ -1,4 +1,5 @@
 import { UserInfo } from '../models/userInfo';
+import { ChatUser } from '../models/chatUser';
 import * as signalR from '@microsoft/signalr';
 
 export class ChatConnection {
@@ -6,7 +7,8 @@ export class ChatConnection {
     public connection: signalR.HubConnection;
     public user: UserInfo;
 
-    constructor(user: UserInfo, urlSignalr: string, onMessage: (user: string, message: string) => void) {
+    constructor(user: UserInfo, urlSignalr: string, onMessage: (user: string, message: string) => void,
+        onUserListChange: (list: ChatUser[]) => void) {
         this.user = user;
         this.urlSignalr = urlSignalr;
         this.connection = new signalR.HubConnectionBuilder()
@@ -20,6 +22,7 @@ export class ChatConnection {
         });
 
         self.connection.on("ReceiveMessage", onMessage);
+        self.connection.on("UsersListChange", onUserListChange);
     }
 
     send = async (msg: string) => {
