@@ -1,4 +1,4 @@
-using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Ro.Services.Chat.Models
@@ -23,6 +23,17 @@ namespace Ro.Services.Chat.Models
     public class ConnectedUsers
     {
         public Dictionary<string, UserInfo> Ids = new Dictionary<string, UserInfo>();
+
+        public IEnumerable<ChatUser> GetUsers(string groupName)
+        {
+            return (from u in this.Ids
+                    where u.Value.Group == groupName
+                    select new ChatUser
+                    {
+                        Id = u.Key,
+                        Name = u.Value.Name
+                    });
+        }
     }
 
 }

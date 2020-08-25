@@ -1,12 +1,7 @@
 import { UserInfo } from '../models/userInfo';
 import { ChatUser } from '../models/chatUser';
 import { ChatConnection } from './ChatConnection';
-
-export interface MessageInfo {
-    user: string;
-    message: string;
-    isLocal: boolean;
-}
+import { MessageInfo } from './messageInfo';
 
 export class ChatTemplates {
     public current: KnockoutObservable<string>;

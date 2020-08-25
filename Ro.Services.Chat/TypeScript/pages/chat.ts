@@ -1,6 +1,8 @@
 import { ChatTemplates } from '../models/chatTemplates';
 import { UserInfo } from '../models/userInfo';
 import { BinderService } from '../services/binderService';
+import { JsonReq } from '../services/jsonReq';
+import { ChatUser } from '../models/chatUser';
 
 const urlBase = $("#urlBase").val() as string;
 const urlHome = $("#urlHome").val() as string;
@@ -20,13 +22,16 @@ let getUserInfo = (): UserInfo => {
     return info;
 }
 
-$(() => {
+$(async () => {
     let info = getUserInfo();
     if (info === null) return;
 
-
     let model = new ChatTemplates(ko, $, info, urlSignalr);
-    model.chatConnection.start();
+    await model.chatConnection.start();
 
+    let api = new JsonReq(urlBase, window);
+    var users = await api.get<ChatUser[]>(`GetUsers?group=${info.group}`);
+    model.users(users);
     BinderService.bind($, model, "#main");
+
 });
