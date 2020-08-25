@@ -2,7 +2,7 @@ import { UserInfo } from '../models/userInfo';
 import { ChatConnection } from './ChatConnection';
 
 export interface MessageInfo {
-    user: UserInfo;
+    user: string;
     message: string;
     isLocal: boolean;
 }
@@ -30,7 +30,7 @@ export class ChatTemplates {
         this.chatConnection = new ChatConnection(user, urlSignalr, self.onMessage);
     }
 
-    public onMessage = (user: UserInfo, message: string) => {
+    public onMessage = (user: string, message: string) => {
         const self = this;
         self.messages.push({ user, message, isLocal: false });
         self.autoScroll();
@@ -49,7 +49,7 @@ export class ChatTemplates {
 
         if (self.$.trim(msg).length > 0) {
             self.chatConnection.send(msg);
-            self.messages.push({ user: self.user, message: msg, isLocal: true });
+            self.messages.push({ user: self.user.name, message: msg, isLocal: true });
             self.autoScroll();
         }
 

@@ -9,10 +9,9 @@
                     data-bind="css:  { 
                         'alert-info text-right': isLocal,
                         'alert-light': !isLocal,
-                    }">                    
-                    <!-- ko if: !isLocal -->
-                    <strong data-bind="text: user.name"></strong>
-                    <!-- /ko -->
+                    }">
+
+                    <strong data-bind="text: user, visible: !isLocal"></strong>
                     <span data-bind="text: message"></span>
                 </p>                
             </div>

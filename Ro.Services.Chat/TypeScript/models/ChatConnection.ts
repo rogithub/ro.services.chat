@@ -1,12 +1,12 @@
-import * as signalR from '@microsoft/signalr';
 import { UserInfo } from '../models/userInfo';
+import * as signalR from '@microsoft/signalr';
 
 export class ChatConnection {
     public urlSignalr: string;
     public connection: signalR.HubConnection;
     public user: UserInfo;
 
-    constructor(user: UserInfo, urlSignalr: string, onMessage: (user: UserInfo, message: string) => void) {
+    constructor(user: UserInfo, urlSignalr: string, onMessage: (user: string, message: string) => void) {
         this.user = user;
         this.urlSignalr = urlSignalr;
         this.connection = new signalR.HubConnectionBuilder()

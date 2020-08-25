@@ -30,11 +30,12 @@ module.exports = {
 
     output: {
         filename: '[name].js',
-        path: path.resolve(__dirname, 'wwwroot/js/transpiled')
+        path: path.resolve(__dirname, 'wwwroot/js')
     },
 
     externals: {
-        'ko': 'ko'
+        'ko': 'ko',
+        'signalR': 'signalR'
     }
 
 }

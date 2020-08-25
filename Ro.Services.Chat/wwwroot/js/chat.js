@@ -182,7 +182,7 @@ var ChatTemplates = /** @class */ (function () {
             var msg = self.message();
             if (self.$.trim(msg).length > 0) {
                 self.chatConnection.send(msg);
-                self.messages.push({ user: self.user, message: msg, isLocal: true });
+                self.messages.push({ user: self.user.name, message: msg, isLocal: true });
                 self.autoScroll();
             }
             self.message("");
