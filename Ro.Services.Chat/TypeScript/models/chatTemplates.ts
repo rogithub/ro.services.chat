@@ -6,6 +6,7 @@ import { MessageInfo } from './messageInfo';
 export class ChatTemplates {
     public current: KnockoutObservable<string>;
     public message: KnockoutObservable<string>;
+    public id: KnockoutObservable<string>;
     public $: JQueryStatic;
     public ko: KnockoutStatic;
     public user: UserInfo;
@@ -21,11 +22,16 @@ export class ChatTemplates {
         this.urlSignalr = urlSignalr;
         this.current = ko.observable<string>("ChatPartial");
         this.message = ko.observable<string>("");
+        this.id = ko.observable<string>("");
         this.messages = ko.observableArray<MessageInfo>([]);
         this.users = ko.observableArray<ChatUser>([]);
         $("#txtMsg").focus();
         const self = this;
-        this.chatConnection = new ChatConnection(user, urlSignalr, self.onMessage, self.onUserListChange);
+        this.chatConnection = new ChatConnection(
+            user, urlSignalr,
+            self.onMessage,
+            self.onUserListChange,
+            self.onStarted);
     }
 
     public onMessage = (user: string, message: string) => {
@@ -34,10 +40,16 @@ export class ChatTemplates {
         self.autoScroll();
     }
 
+    public onStarted = (id: string) => {
+        const self = this;
+        self.id(id);
+        console.log("connected", id);
+    }
+
     public onUserListChange = (list: ChatUser[]) => {
         const self = this;
-        console.dir(list);
-        self.users(list);
+        let others = self.ko.utils.arrayFilter(list, u => u.id !== self.id());
+        self.users(others);
     }
 
     public autoScroll = () => {

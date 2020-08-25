@@ -223,22 +223,30 @@ var getUserInfo = function () {
     return info;
 };
 $(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var info, model, api, users;
+    var info, api, model;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 info = getUserInfo();
                 if (info === null)
                     return [2 /*return*/];
+                api = new jsonReq_1.JsonReq(urlBase, window);
                 model = new chatTemplates_1.ChatTemplates(ko, $, info, urlSignalr);
+                model.id.subscribe(function (id) { return __awaiter(void 0, void 0, void 0, function () {
+                    var users;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, api.get("GetUsers?group=" + info.group)];
+                            case 1:
+                                users = _a.sent();
+                                model.users(ko.utils.arrayFilter(users, function (u) { return u.id !== id; }));
+                                return [2 /*return*/];
+                        }
+                    });
+                }); });
                 return [4 /*yield*/, model.chatConnection.start()];
             case 1:
                 _a.sent();
-                api = new jsonReq_1.JsonReq(urlBase, window);
-                return [4 /*yield*/, api.get("GetUsers?group=" + info.group)];
-            case 2:
-                users = _a.sent();
-                model.users(users);
                 binderService_1.BinderService.bind($, model, "#main");
                 return [2 /*return*/];
         }
@@ -263,10 +271,15 @@ var ChatTemplates = /** @class */ (function () {
             self.messages.push({ user: user, message: message, isLocal: false });
             self.autoScroll();
         };
+        this.onStarted = function (id) {
+            var self = _this;
+            self.id(id);
+            console.log("connected", id);
+        };
         this.onUserListChange = function (list) {
             var self = _this;
-            console.dir(list);
-            self.users(list);
+            var others = self.ko.utils.arrayFilter(list, function (u) { return u.id !== self.id(); });
+            self.users(others);
         };
         this.autoScroll = function () {
             var self = _this;
@@ -293,11 +306,12 @@ var ChatTemplates = /** @class */ (function () {
         this.urlSignalr = urlSignalr;
         this.current = ko.observable("ChatPartial");
         this.message = ko.observable("");
+        this.id = ko.observable("");
         this.messages = ko.observableArray([]);
         this.users = ko.observableArray([]);
         $("#txtMsg").focus();
         var self = this;
-        this.chatConnection = new ChatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onUserListChange);
+        this.chatConnection = new ChatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onUserListChange, self.onStarted);
     }
     return ChatTemplates;
 }());
@@ -350,7 +364,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatConnection = void 0;
 var signalR = __webpack_require__(18);
 var ChatConnection = /** @class */ (function () {
-    function ChatConnection(user, urlSignalr, onMessage, onUserListChange) {
+    function ChatConnection(user, urlSignalr, onMessage, onUserListChange, onStarted) {
         var _this = this;
         this.send = function (msg) { return __awaiter(_this, void 0, void 0, function () {
             var self;
@@ -383,7 +397,6 @@ var ChatConnection = /** @class */ (function () {
                         return [4 /*yield*/, self.setInfo()];
                     case 3:
                         _a.sent();
-                        console.log("connected");
                         return [3 /*break*/, 5];
                     case 4:
                         err_1 = _a.sent();
@@ -401,6 +414,7 @@ var ChatConnection = /** @class */ (function () {
             .configureLogging(signalR.LogLevel.Information)
             .build();
         var self = this;
+        self.id = ko.observable("");
         self.connection.onclose(function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -413,6 +427,7 @@ var ChatConnection = /** @class */ (function () {
         }); });
         self.connection.on("ReceiveMessage", onMessage);
         self.connection.on("UsersListChange", onUserListChange);
+        self.connection.on("SetOwnId", onStarted);
     }
     return ChatConnection;
 }());

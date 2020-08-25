@@ -28,6 +28,7 @@ namespace Ro.Services.Chat.SignalRHubs
         public override async Task OnConnectedAsync()
         {
             Connected.Ids.Add(Context.ConnectionId, null);
+            await Clients.Caller.SendAsync("SetOwnId", Context.ConnectionId);
             await base.OnConnectedAsync();
         }
 

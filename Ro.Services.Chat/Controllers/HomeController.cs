@@ -14,11 +14,14 @@ namespace Ro.Services.Chat.Controllers
         private string[] FreeGroups { get; set; }
         private readonly ILogger<HomeController> _logger;
         private ConnectedUsers ConnectedUsers { get; set; }
+        private IHubContext<ChatHub> ChatHub { get; set; }
         public HomeController(
+            IHubContext<ChatHub> chatHub,
             ConnectedUsers users,
             ILogger<HomeController> logger,
             IConfiguration config)
         {
+            this.ChatHub = chatHub;
             ConnectedUsers = users;
             _logger = logger;
             FreeGroups = config.GetSection("App:Groups").Get<string[]>();
@@ -41,9 +44,9 @@ namespace Ro.Services.Chat.Controllers
             return View();
         }
 
-        public IActionResult GetUsers(string group)
+        public IActionResult GetUsers(string groupName)
         {
-            return Json(ConnectedUsers.GetUsers(group));
+            return Json(ConnectedUsers.GetUsers(groupName));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

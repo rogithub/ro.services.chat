@@ -26,12 +26,15 @@ $(async () => {
     let info = getUserInfo();
     if (info === null) return;
 
-    let model = new ChatTemplates(ko, $, info, urlSignalr);
-    await model.chatConnection.start();
-
     let api = new JsonReq(urlBase, window);
-    var users = await api.get<ChatUser[]>(`GetUsers?group=${info.group}`);
-    model.users(users);
+    let model = new ChatTemplates(ko, $, info, urlSignalr);
+
+    model.id.subscribe(async (id: string) => {
+        var users = await api.get<ChatUser[]>(`GetUsers?group=${info.group}`);
+        model.users(ko.utils.arrayFilter(users, u => u.id !== id));
+    });
+
+    await model.chatConnection.start();
     BinderService.bind($, model, "#main");
 
 });
