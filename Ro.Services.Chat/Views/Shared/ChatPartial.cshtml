@@ -7,8 +7,8 @@
             <div class="col">
                 <p class='alert' 
                     data-bind="css:  { 
-                        'alert-info text-right': isLocal,
-                        'alert-light': !isLocal,
+                        'alert-dark text-right msgSaliente': isLocal,
+                        'alert-secondary msgEntrante': !isLocal,
                     }">
 
                     <strong data-bind="text: user, visible: !isLocal"></strong>
