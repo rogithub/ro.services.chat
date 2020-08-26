@@ -53,23 +53,28 @@ export class ChatTemplates {
 
     public onPrivateMessage = (idFrom: string, message: string) => {
         const self = this;
-        let messages = self.privateMessages[idFrom];
+
+        if (!self.privateMessages[idFrom]) {
+            self.privateMessages[idFrom] = self.ko.observableArray<MessageInfo>();
+        }
+
+        console.dir(self.privateMessages[idFrom]());
+
         let user = self.ko.utils.arrayFirst(self.users(), u => u.id === idFrom);
         if (user === null || user === undefined) {
             user = {
                 id: idFrom,
                 name: "Desconectado"
             };
-
         }
-        messages.push({ user, message, isLocal: false, date: new Date() });
+
+        self.privateMessages[idFrom].push({ user: user.name, message, isLocal: false, date: new Date() });
         self.autoScroll();
     }
 
     public onStarted = (id: string) => {
         const self = this;
         self.id(id);
-        console.log("connected", id);
     }
 
     public onUserListChange = (list: ChatUser[]) => {
@@ -109,7 +114,7 @@ export class ChatTemplates {
 
     public privateChat = (to: ChatUser) => {
         const self = this;
-        if (self.privateChat.prototype.hasOwnProperty(to.id) === false) {
+        if (!self.privateMessages[to.id]) {
             self.privateMessages[to.id] = self.ko.observableArray<MessageInfo>();
         }
         self.current("ChatPartial");

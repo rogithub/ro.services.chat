@@ -274,7 +274,10 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.onPrivateMessage = function (idFrom, message) {
             var self = _this;
-            var messages = self.privateMessages[idFrom];
+            if (!self.privateMessages[idFrom]) {
+                self.privateMessages[idFrom] = self.ko.observableArray();
+            }
+            console.dir(self.privateMessages[idFrom]());
             var user = self.ko.utils.arrayFirst(self.users(), function (u) { return u.id === idFrom; });
             if (user === null || user === undefined) {
                 user = {
@@ -282,13 +285,12 @@ var ChatTemplates = /** @class */ (function () {
                     name: "Desconectado"
                 };
             }
-            messages.push({ user: user, message: message, isLocal: false, date: new Date() });
+            self.privateMessages[idFrom].push({ user: user.name, message: message, isLocal: false, date: new Date() });
             self.autoScroll();
         };
         this.onStarted = function (id) {
             var self = _this;
             self.id(id);
-            console.log("connected", id);
         };
         this.onUserListChange = function (list) {
             var self = _this;
@@ -320,7 +322,7 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.privateChat = function (to) {
             var self = _this;
-            if (self.privateChat.prototype.hasOwnProperty(to.id) === false) {
+            if (!self.privateMessages[to.id]) {
                 self.privateMessages[to.id] = self.ko.observableArray();
             }
             self.current("ChatPartial");
