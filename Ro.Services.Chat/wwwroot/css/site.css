@@ -18,9 +18,11 @@ form#frmMsg {
 }
 
 .msgSaliente {
-    background-color: #8da882;
+    background-color: #c0d9a4;
+    display:inline-block;
 }
 
 .msgEntrante {
-    background-color: #c0d9a4;
+    background-color: white;
+    display:inline-block;
 }

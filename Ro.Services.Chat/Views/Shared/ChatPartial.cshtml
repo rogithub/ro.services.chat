@@ -3,20 +3,19 @@
 <script type="text/html" id="ChatPartial">
     <div id="mesagges" class="container pagecontent">        
     <!-- ko foreach: messages() -->
-        <div class="row">
-            <div class="col">
-                <p class='alert' 
-                    data-bind="css:  { 
-                        'alert-dark text-right msgSaliente': isLocal,
-                        'alert-secondary msgEntrante': !isLocal,
-                    }">
-
-                    <strong data-bind="text: user, visible: !isLocal"></strong>
-                    <span data-bind="text: message"></span>
-                </p>                
-            </div>
+        <div data-bind="css:  { 
+                                'text-right': isLocal                                
+                            }">
+            <p class="alert" data-bind="css:  { 
+                                'msgSaliente': isLocal,
+                                'msgEntrante': !isLocal,
+                            }">
+                <strong data-bind="text: user, visible: !isLocal"></strong>
+                <span data-bind="text: message"></span>            
+            </p>
         </div>
     <!-- /ko -->
+
     </div>
 
     <nav class="navbar fixed-bottom navbar-dark bg-dark">
