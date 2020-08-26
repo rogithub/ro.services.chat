@@ -269,7 +269,7 @@ var ChatTemplates = /** @class */ (function () {
         var _this = this;
         this.onMessage = function (user, message) {
             var self = _this;
-            self.messages.push({ user: user, message: message, isLocal: false });
+            self.messages.push({ user: user, message: message, isLocal: false, date: new Date() });
             self.autoScroll();
         };
         this.onStarted = function (id) {
@@ -295,7 +295,7 @@ var ChatTemplates = /** @class */ (function () {
             var msg = self.message();
             if (self.$.trim(msg).length > 0) {
                 self.chatConnection.send(msg);
-                self.messages.push({ user: self.user.name, message: msg, isLocal: true });
+                self.messages.push({ user: self.user.name, message: msg, isLocal: true, date: new Date() });
                 self.autoScroll();
             }
             self.message("");

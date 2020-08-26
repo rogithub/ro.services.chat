@@ -36,7 +36,7 @@ export class ChatTemplates {
 
     public onMessage = (user: string, message: string) => {
         const self = this;
-        self.messages.push({ user, message, isLocal: false });
+        self.messages.push({ user, message, isLocal: false, date: new Date() });
         self.autoScroll();
     }
 
@@ -67,7 +67,7 @@ export class ChatTemplates {
 
         if (self.$.trim(msg).length > 0) {
             self.chatConnection.send(msg);
-            self.messages.push({ user: self.user.name, message: msg, isLocal: true });
+            self.messages.push({ user: self.user.name, message: msg, isLocal: true, date: new Date() });
             self.autoScroll();
         }
 

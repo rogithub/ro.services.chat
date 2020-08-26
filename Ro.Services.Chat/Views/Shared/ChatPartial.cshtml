@@ -11,7 +11,14 @@
                                 'msgEntrante': !isLocal,
                             }">
                 <strong data-bind="text: user, visible: !isLocal"></strong>
-                <span data-bind="text: message"></span>            
+                <span data-bind="text: message"></span>
+
+                <small class="text-muted" data-bind="text: date.toLocaleTimeString('en-US',
+                {
+                    hour12 : true,
+                    hour:  '2-digit',
+                    minute: '2-digit'
+                });"></small>
             </p>
         </div>
     <!-- /ko -->
