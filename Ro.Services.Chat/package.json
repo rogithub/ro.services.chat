@@ -7,7 +7,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "webpack",
         "core": "webpack && dotnet run urls=https://localhost:5002",
-        "clean": "rm ./wwwroot/transpiled/* && webpack && dotnet run urls=https://localhost:5002"
+        "clean": "rm ./wwwroot/js/* && webpack && dotnet run urls=https://localhost:5002"
     },
     "repository": {
         "type": "git",
@@ -34,5 +34,6 @@
         "typescript": "^4.0.2",
         "webpack": "^4.44.1",
         "webpack-cli": "^3.3.12"
-    }
+    },
+    "dependencies": {}
 }

@@ -26,3 +26,7 @@ form#frmMsg {
     background-color: white;
     display:inline-block;
 }
+
+a.useritem {
+    text-decoration: none !important;
+}

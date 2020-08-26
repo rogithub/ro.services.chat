@@ -1,5 +1,5 @@
-import { UserInfo } from '../models/userInfo';
-import { ChatUser } from '../models/chatUser';
+import { UserInfo } from './userInfo';
+import { ChatUser } from './chatUser';
 import * as signalR from '@microsoft/signalr';
 
 export class ChatConnection {

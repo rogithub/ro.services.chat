@@ -263,7 +263,7 @@ $(function () { return __awaiter(void 0, void 0, void 0, function () {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatTemplates = void 0;
-var ChatConnection_1 = __webpack_require__(11);
+var chatConnection_1 = __webpack_require__(11);
 var ChatTemplates = /** @class */ (function () {
     function ChatTemplates(ko, $, user, urlSignalr) {
         var _this = this;
@@ -301,6 +301,14 @@ var ChatTemplates = /** @class */ (function () {
             self.message("");
             txtMessage.focus();
         };
+        this.privateChat = function (to) {
+            var self = _this;
+            if (self.privateChat.prototype.hasOwnProperty(to.id) === false) {
+                self.privateMessages[to.id] = self.ko.observableArray();
+            }
+            self.current("ChatPartial");
+            self.chattingWith(to);
+        };
         this.ko = ko;
         this.$ = $;
         this.user = user;
@@ -308,11 +316,13 @@ var ChatTemplates = /** @class */ (function () {
         this.current = ko.observable("ChatPartial");
         this.message = ko.observable("");
         this.id = ko.observable("");
+        this.chattingWith = ko.observable();
         this.messages = ko.observableArray([]);
         this.users = ko.observableArray([]);
+        this.privateMessages = {};
         $("#txtMsg").focus();
         var self = this;
-        this.chatConnection = new ChatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onUserListChange, self.onStarted);
+        this.chatConnection = new chatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onUserListChange, self.onStarted);
     }
     return ChatTemplates;
 }());
