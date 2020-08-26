@@ -12,6 +12,7 @@ export class ChatConnection {
         user: UserInfo,
         urlSignalr: string,
         onMessage: (user: string, message: string) => void,
+        onPrivateMessage: (id: string, message: string) => void,
         onUserListChange: (list: ChatUser[]) => void,
         onStarted: (id: string) => void) {
         this.user = user;
@@ -28,6 +29,7 @@ export class ChatConnection {
         });
 
         self.connection.on("ReceiveMessage", onMessage);
+        self.connection.on("ReceivePrivateMessage", onPrivateMessage);
         self.connection.on("UsersListChange", onUserListChange);
         self.connection.on("SetOwnId", onStarted);
     }
@@ -35,6 +37,11 @@ export class ChatConnection {
     send = async (msg: string) => {
         const self = this;
         self.connection.invoke("SendMessage", self.user, msg);
+    };
+
+    sendTo = async (msg: string, id: string) => {
+        const self = this;
+        self.connection.invoke("SendMessageTo", id, msg);
     };
 
     setInfo = async () => {

@@ -2,6 +2,7 @@
 
 <script type="text/html" id="ChatPartial">
     <div id="mesagges" class="container pagecontent">        
+    <!-- ko if: isPublic() === true -->
     <!-- ko foreach: messages() -->
         <div data-bind="css:  { 
                                 'text-right': isLocal                                
@@ -22,7 +23,28 @@
             </p>
         </div>
     <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko if: isPublic() === false -->
+    <!-- ko foreach: privateMessages[chattingWith().id]() -->
+        <div data-bind="css:  { 
+                                'text-right': isLocal                                
+                            }">
+            <p class="alert" data-bind="css:  { 
+                                'msgSaliente': isLocal,
+                                'msgEntrante': !isLocal,
+                            }">                
+                <span data-bind="text: message"></span>
 
+                <small class="text-muted" data-bind="text: date.toLocaleTimeString('en-US',
+                {
+                    hour12 : true,
+                    hour:  '2-digit',
+                    minute: '2-digit'
+                });"></small>
+            </p>
+        </div>
+    <!-- /ko -->
+    <!-- /ko -->    
     </div>
 
     <nav class="navbar fixed-bottom navbar-dark bg-dark">

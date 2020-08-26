@@ -272,6 +272,19 @@ var ChatTemplates = /** @class */ (function () {
             self.messages.push({ user: user, message: message, isLocal: false, date: new Date() });
             self.autoScroll();
         };
+        this.onPrivateMessage = function (idFrom, message) {
+            var self = _this;
+            var messages = self.privateMessages[idFrom];
+            var user = self.ko.utils.arrayFirst(self.users(), function (u) { return u.id === idFrom; });
+            if (user === null || user === undefined) {
+                user = {
+                    id: idFrom,
+                    name: "Desconectado"
+                };
+            }
+            messages.push({ user: user, message: message, isLocal: false, date: new Date() });
+            self.autoScroll();
+        };
         this.onStarted = function (id) {
             var self = _this;
             self.id(id);
@@ -294,8 +307,12 @@ var ChatTemplates = /** @class */ (function () {
             var txtMessage = self.$("#txtMsg");
             var msg = self.message();
             if (self.$.trim(msg).length > 0) {
-                self.chatConnection.send(msg);
-                self.messages.push({ user: self.user.name, message: msg, isLocal: true, date: new Date() });
+                var isPublic = self.isPublic();
+                var item = { user: self.user.name, message: msg, isLocal: true, date: new Date() };
+                var send = isPublic ? function () { return self.chatConnection.send(msg); } : function () { return self.chatConnection.sendTo(msg, self.chattingWith().id); };
+                var list = isPublic ? self.messages : self.privateMessages[self.chattingWith().id];
+                send();
+                list.push(item);
                 self.autoScroll();
             }
             self.message("");
@@ -322,7 +339,10 @@ var ChatTemplates = /** @class */ (function () {
         this.privateMessages = {};
         $("#txtMsg").focus();
         var self = this;
-        this.chatConnection = new chatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onUserListChange, self.onStarted);
+        this.chatConnection = new chatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onPrivateMessage, self.onUserListChange, self.onStarted);
+        this.isPublic = ko.pureComputed(function () {
+            return (self.chattingWith() === null || self.chattingWith() === undefined);
+        }, self);
     }
     return ChatTemplates;
 }());
@@ -375,13 +395,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatConnection = void 0;
 var signalR = __webpack_require__(18);
 var ChatConnection = /** @class */ (function () {
-    function ChatConnection(user, urlSignalr, onMessage, onUserListChange, onStarted) {
+    function ChatConnection(user, urlSignalr, onMessage, onPrivateMessage, onUserListChange, onStarted) {
         var _this = this;
         this.send = function (msg) { return __awaiter(_this, void 0, void 0, function () {
             var self;
             return __generator(this, function (_a) {
                 self = this;
                 self.connection.invoke("SendMessage", self.user, msg);
+                return [2 /*return*/];
+            });
+        }); };
+        this.sendTo = function (msg, id) { return __awaiter(_this, void 0, void 0, function () {
+            var self;
+            return __generator(this, function (_a) {
+                self = this;
+                self.connection.invoke("SendMessageTo", id, msg);
                 return [2 /*return*/];
             });
         }); };
@@ -437,6 +465,7 @@ var ChatConnection = /** @class */ (function () {
             });
         }); });
         self.connection.on("ReceiveMessage", onMessage);
+        self.connection.on("ReceivePrivateMessage", onPrivateMessage);
         self.connection.on("UsersListChange", onUserListChange);
         self.connection.on("SetOwnId", onStarted);
     }

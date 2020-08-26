@@ -9,6 +9,7 @@ export class ChatTemplates {
     public message: KnockoutObservable<string>;
     public id: KnockoutObservable<string>;
     public chattingWith: KnockoutObservable<ChatUser>;
+    public isPublic: KnockoutComputed<boolean>;
     public $: JQueryStatic;
     public ko: KnockoutStatic;
     public user: UserInfo;
@@ -30,19 +31,38 @@ export class ChatTemplates {
         this.messages = ko.observableArray<MessageInfo>([]);
         this.users = ko.observableArray<ChatUser>([]);
         this.privateMessages = {};
-
         $("#txtMsg").focus();
         const self = this;
         this.chatConnection = new ChatConnection(
             user, urlSignalr,
             self.onMessage,
+            self.onPrivateMessage,
             self.onUserListChange,
             self.onStarted);
+
+        this.isPublic = ko.pureComputed<boolean>(() => {
+            return (self.chattingWith() === null || self.chattingWith() === undefined);
+        }, self);
     }
 
     public onMessage = (user: string, message: string) => {
         const self = this;
         self.messages.push({ user, message, isLocal: false, date: new Date() });
+        self.autoScroll();
+    }
+
+    public onPrivateMessage = (idFrom: string, message: string) => {
+        const self = this;
+        let messages = self.privateMessages[idFrom];
+        let user = self.ko.utils.arrayFirst(self.users(), u => u.id === idFrom);
+        if (user === null || user === undefined) {
+            user = {
+                id: idFrom,
+                name: "Desconectado"
+            };
+
+        }
+        messages.push({ user, message, isLocal: false, date: new Date() });
         self.autoScroll();
     }
 
@@ -72,8 +92,14 @@ export class ChatTemplates {
         let msg = self.message();
 
         if (self.$.trim(msg).length > 0) {
-            self.chatConnection.send(msg);
-            self.messages.push({ user: self.user.name, message: msg, isLocal: true, date: new Date() });
+            const isPublic = self.isPublic();
+            const item: MessageInfo = { user: self.user.name, message: msg, isLocal: true, date: new Date() };
+            let send = isPublic ? () => self.chatConnection.send(msg) : () => self.chatConnection.sendTo(msg, self.chattingWith().id);
+            let list: KnockoutObservableArray<MessageInfo> = isPublic ? self.messages : self.privateMessages[self.chattingWith().id];
+
+            send();
+            list.push(item);
+
             self.autoScroll();
         }
 
@@ -84,7 +110,7 @@ export class ChatTemplates {
     public privateChat = (to: ChatUser) => {
         const self = this;
         if (self.privateChat.prototype.hasOwnProperty(to.id) === false) {
-            self.privateMessages[to.id] = self.ko.observableArray<string>();
+            self.privateMessages[to.id] = self.ko.observableArray<MessageInfo>();
         }
         self.current("ChatPartial");
         self.chattingWith(to);
