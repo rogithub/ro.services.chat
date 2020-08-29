@@ -328,6 +328,10 @@ var ChatTemplates = /** @class */ (function () {
             self.current("ChatPartial");
             self.chattingWith(to);
         };
+        this.afterRender = function () {
+            var self = _this;
+            self.$('#tabMenu a[href="#chat"]').tab('show');
+        };
         this.ko = ko;
         this.$ = $;
         this.user = user;

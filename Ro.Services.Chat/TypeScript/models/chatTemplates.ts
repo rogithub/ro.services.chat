@@ -121,4 +121,9 @@ export class ChatTemplates {
         self.chattingWith(to);
     }
 
+    public afterRender = () => {
+        const self = this;
+        self.$('#tabMenu a[href="#chat"]').tab('show')
+    }
+
 }

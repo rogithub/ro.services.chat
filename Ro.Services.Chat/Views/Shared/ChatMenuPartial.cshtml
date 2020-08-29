@@ -1,6 +1,6 @@
 <script type="text/html" id="ChatMenuPartial">
-    <header>
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <header class="fixed-top">
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark">
             <a class="navbar-brand" href="#">
 
                 <!-- ko if: isPublic() === true -->
@@ -24,26 +24,27 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item" data-bind="css: { 'active': current() === 'ChatPartial' }">
-                        <a class="nav-link" href="#" data-bind="click: ()=> {
-                                current('ChatPartial');
-                                chattingWith(null);
-                            }">
-                            <span data-bind="text: isPublic() ? 
-                                'Chat' : user.group">
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-bind="css: { 'active': current() === 'ChatUsersPartial' }">
-                        <a class="nav-link" href="#" data-bind="click: ()=> current('ChatUsersPartial')">Usuarios</a>
-                    </li>
+                <ul class="navbar-nav mr-auto">                    
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("Index","Home")">Salir</a>
                     </li>
                 </ul>
-
+            </div>            
+        </nav>
+        <nav class="navbar-dark bg-dark">
+            <div class="nav nav-tabs" id="tabMenu" role="tablist">
+                <a data-bind="click: ()=> {
+                                    current('ChatPartial');
+                                    chattingWith(null);
+                    }"
+                class="nav-link active" id="nav-chat-tab" data-toggle="tab" href="#nav-chat" role="tab" aria-controls="nav-chat" aria-selected="true">
+                    Chat
+                </a>
+                <a  data-bind="click: ()=> current('ChatUsersPartial')"
+                    class="nav-link" id="nav-users-tab" data-toggle="tab" href="#nav-users" role="tab" aria-controls="nav-users" aria-selected="false">
+                    Usuarios
+                </a>
             </div>
         </nav>
-    </header>
+    </header>        
 </script>
