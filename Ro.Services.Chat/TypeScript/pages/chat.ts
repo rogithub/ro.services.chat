@@ -32,7 +32,7 @@ $(async () => {
     model.id.subscribe(async (id: string) => {
         var users = await api.get<ChatUser[]>(`GetUsers?groupName=${info.group}`);
         var others = ko.utils.arrayFilter(users, u => u.id !== id);
-        model.users(others);
+        model.onUserListChange(others);
     });
 
     await model.chatConnection.start();

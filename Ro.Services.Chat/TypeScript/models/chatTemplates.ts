@@ -1,5 +1,5 @@
 import { UserInfo } from '../models/userInfo';
-import { ChatUser } from '../models/chatUser';
+import { ChatUser, ChatStateUser } from '../models/chatUser';
 import { ChatConnection } from './chatConnection';
 import { MessageInfo } from './messageInfo';
 import { ObjectLiteral } from '../shared/objectLiteral';
@@ -8,7 +8,7 @@ export class ChatTemplates {
 
     public message: KnockoutObservable<string>;
     public id: KnockoutObservable<string>;
-    public chattingWith: KnockoutObservable<ChatUser>;
+    public chattingWith: KnockoutObservable<ChatStateUser>;
     public isPublic: KnockoutComputed<boolean>;
     public $: JQueryStatic;
     public ko: KnockoutStatic;
@@ -16,9 +16,9 @@ export class ChatTemplates {
     public urlSignalr: string;
     public chatConnection: ChatConnection;
     public messages: KnockoutObservableArray<MessageInfo>;
-    public users: KnockoutObservableArray<ChatUser>;
+    public users: KnockoutObservableArray<ChatStateUser>;
     public usersFilter: KnockoutObservable<string>;
-    public filteredUsers: KnockoutComputed<ChatUser[]>;
+    public filteredUsers: KnockoutComputed<ChatStateUser[]>;
     public privateMessages: ObjectLiteral;
 
     constructor(ko: KnockoutStatic, $: JQueryStatic, user: UserInfo, urlSignalr: string) {
@@ -29,9 +29,9 @@ export class ChatTemplates {
         this.message = ko.observable<string>("");
         this.id = ko.observable<string>("");
         this.usersFilter = ko.observable<string>("");
-        this.chattingWith = ko.observable<ChatUser>();
+        this.chattingWith = ko.observable<ChatStateUser>();
         this.messages = ko.observableArray<MessageInfo>([]);
-        this.users = ko.observableArray<ChatUser>([]);
+        this.users = ko.observableArray<ChatStateUser>([]);
         this.privateMessages = {};
         $("#txtMsg").focus();
         const self = this;
@@ -46,8 +46,14 @@ export class ChatTemplates {
             return (self.chattingWith() === null || self.chattingWith() === undefined);
         }, self);
         
-        this.filteredUsers = ko.pureComputed<ChatUser[]>(() => {
-            if ($.trim(self.usersFilter()).length === 0) return self.users();
+        this.filteredUsers = ko.pureComputed<ChatStateUser[]>(() => {
+            if 
+            (
+                self.usersFilter() === null ||
+                self.usersFilter() === undefined ||
+                self.usersFilter() === "" ||
+                $.trim(self.usersFilter()).length === 0
+            ) return self.users();
 
             return ko.utils.arrayFilter(self.users(), 
                 u => u.name.toLocaleLowerCase().indexOf
@@ -69,14 +75,12 @@ export class ChatTemplates {
             self.privateMessages[idFrom] = self.ko.observableArray<MessageInfo>();
         }
 
-        console.dir(self.privateMessages[idFrom]());
-
         let user = self.ko.utils.arrayFirst(self.users(), u => u.id === idFrom);
         if (user === null || user === undefined) {
-            user = {
+            user =new ChatStateUser(self.ko, {
                 id: idFrom,
                 name: "Desconectado"
-            };
+            }, false);
         }
 
         self.privateMessages[idFrom].push({ user: user.name, message, isLocal: false, date: new Date() });
@@ -90,8 +94,32 @@ export class ChatTemplates {
 
     public onUserListChange = (list: ChatUser[]) => {
         const self = this;
-        let others = self.ko.utils.arrayFilter(list, u => u.id !== self.id());
-        self.users(others);
+
+        let connectedIds = self.ko.utils.arrayMap(list, u => u.id);
+
+        let rescued = self.ko.utils.arrayFilter(self.users(), u => {
+            let disconected = connectedIds.indexOf(u.id) === -1;
+            if (disconected === false) return false;
+                        
+            let emptyMessages = (self.privateMessages[u.id] === null ||
+                self.privateMessages[u.id] === undefined); 
+                
+            if (emptyMessages) return false;
+
+            return self.privateMessages[u.id]().length > 0;
+        });
+
+        self.users.removeAll();        
+        for (let u of rescued)
+        {
+            u.connected(false);
+        }
+        self.users(rescued);
+        let others = self.ko.utils.arrayFilter(list, u => u.id !== self.id());        
+        for (let u of others)
+        {
+            self.users.push(new ChatStateUser(self.ko, u));
+        }
     }
 
     public autoScroll = () => {
@@ -123,7 +151,7 @@ export class ChatTemplates {
         txtMessage.focus();
     }
 
-    public privateChat = (to: ChatUser) => {
+    public privateChat = (to: ChatStateUser) => {
         const self = this;
         if (!self.privateMessages[to.id]) {
             self.privateMessages[to.id] = self.ko.observableArray<MessageInfo>();

@@ -47,9 +47,22 @@
     <!-- /ko -->    
     </div>
 
+    <!-- ko if: (isPublic() || chattingWith().connected())  -->
     <nav class="navbar fixed-bottom navbar-dark bg-dark">
         <form id="frmMsg" data-bind="submit: sendMessage.bind($data)">    
             <input type="text" id="txtMsg" class="form-control" data-bind="textInput: message" required maxlength="250">            
         </form>
     </nav>
+    <!-- /ko -->
+
+    <!-- ko if: (isPublic() === false && chattingWith().connected() === false)  -->
+    <nav class="navbar fixed-bottom navbar-dark bg-dark">
+        <div class="text-center">
+            <p class="alert alert-danger">
+                Usuario desconectado
+                <a href="#" class="btn btn-danger">Borrar conversación</a>
+            </p>
+        </div>        
+    </nav>
+    <!-- /ko -->
 </script>

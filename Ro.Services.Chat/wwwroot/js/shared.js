@@ -475,9 +475,9 @@ var TextMessageFormat = /** @class */ (function () {
 
 
 
-var base64 = __webpack_require__(13)
-var ieee754 = __webpack_require__(14)
-var isArray = __webpack_require__(15)
+var base64 = __webpack_require__(14)
+var ieee754 = __webpack_require__(15)
+var isArray = __webpack_require__(16)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2255,7 +2255,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(13)))
 
 /***/ }),
 /* 7 */
@@ -2443,7 +2443,8 @@ var HandshakeProtocol = /** @class */ (function () {
 /* 9 */,
 /* 10 */,
 /* 11 */,
-/* 12 */
+/* 12 */,
+/* 13 */
 /***/ (function(module, exports) {
 
 var g;
@@ -2469,7 +2470,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2628,7 +2629,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -2718,7 +2719,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -2729,9 +2730,9 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 16 */,
 /* 17 */,
-/* 18 */
+/* 18 */,
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

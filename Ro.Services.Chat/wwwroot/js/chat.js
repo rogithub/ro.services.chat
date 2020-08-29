@@ -206,8 +206,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var chatTemplates_1 = __webpack_require__(10);
-var binderService_1 = __webpack_require__(16);
-var jsonReq_1 = __webpack_require__(17);
+var binderService_1 = __webpack_require__(17);
+var jsonReq_1 = __webpack_require__(18);
 var urlBase = $("#urlBase").val();
 var urlHome = $("#urlHome").val();
 var urlSignalr = urlBase + "/chathub";
@@ -240,7 +240,7 @@ $(function () { return __awaiter(void 0, void 0, void 0, function () {
                             case 1:
                                 users = _a.sent();
                                 others = ko.utils.arrayFilter(users, function (u) { return u.id !== id; });
-                                model.users(others);
+                                model.onUserListChange(others);
                                 return [2 /*return*/];
                         }
                     });
@@ -263,7 +263,8 @@ $(function () { return __awaiter(void 0, void 0, void 0, function () {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatTemplates = void 0;
-var chatConnection_1 = __webpack_require__(11);
+var chatUser_1 = __webpack_require__(11);
+var chatConnection_1 = __webpack_require__(12);
 var ChatTemplates = /** @class */ (function () {
     function ChatTemplates(ko, $, user, urlSignalr) {
         var _this = this;
@@ -277,13 +278,12 @@ var ChatTemplates = /** @class */ (function () {
             if (!self.privateMessages[idFrom]) {
                 self.privateMessages[idFrom] = self.ko.observableArray();
             }
-            console.dir(self.privateMessages[idFrom]());
             var user = self.ko.utils.arrayFirst(self.users(), function (u) { return u.id === idFrom; });
             if (user === null || user === undefined) {
-                user = {
+                user = new chatUser_1.ChatStateUser(self.ko, {
                     id: idFrom,
                     name: "Desconectado"
-                };
+                }, false);
             }
             self.privateMessages[idFrom].push({ user: user.name, message: message, isLocal: false, date: new Date() });
             self.autoScroll();
@@ -294,8 +294,28 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.onUserListChange = function (list) {
             var self = _this;
+            var connectedIds = self.ko.utils.arrayMap(list, function (u) { return u.id; });
+            var rescued = self.ko.utils.arrayFilter(self.users(), function (u) {
+                var disconected = connectedIds.indexOf(u.id) === -1;
+                if (disconected === false)
+                    return false;
+                var emptyMessages = (self.privateMessages[u.id] === null ||
+                    self.privateMessages[u.id] === undefined);
+                if (emptyMessages)
+                    return false;
+                return self.privateMessages[u.id]().length > 0;
+            });
+            self.users.removeAll();
+            for (var _i = 0, rescued_1 = rescued; _i < rescued_1.length; _i++) {
+                var u = rescued_1[_i];
+                u.connected(false);
+            }
+            self.users(rescued);
             var others = self.ko.utils.arrayFilter(list, function (u) { return u.id !== self.id(); });
-            self.users(others);
+            for (var _a = 0, others_1 = others; _a < others_1.length; _a++) {
+                var u = others_1[_a];
+                self.users.push(new chatUser_1.ChatStateUser(self.ko, u));
+            }
         };
         this.autoScroll = function () {
             var self = _this;
@@ -361,7 +381,10 @@ var ChatTemplates = /** @class */ (function () {
             return (self.chattingWith() === null || self.chattingWith() === undefined);
         }, self);
         this.filteredUsers = ko.pureComputed(function () {
-            if ($.trim(self.usersFilter()).length === 0)
+            if (self.usersFilter() === null ||
+                self.usersFilter() === undefined ||
+                self.usersFilter() === "" ||
+                $.trim(self.usersFilter()).length === 0)
                 return self.users();
             return ko.utils.arrayFilter(self.users(), function (u) { return u.name.toLocaleLowerCase().indexOf(self.usersFilter().toLocaleLowerCase()) !== -1; });
         }, self);
@@ -373,6 +396,26 @@ exports.ChatTemplates = ChatTemplates;
 
 /***/ }),
 /* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChatStateUser = void 0;
+var ChatStateUser = /** @class */ (function () {
+    function ChatStateUser(ko, u, connected) {
+        if (connected === void 0) { connected = true; }
+        this.id = u.id;
+        this.name = u.name;
+        this.connected = ko.observable(connected);
+    }
+    return ChatStateUser;
+}());
+exports.ChatStateUser = ChatStateUser;
+
+
+/***/ }),
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -415,7 +458,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatConnection = void 0;
-var signalR = __webpack_require__(18);
+var signalR = __webpack_require__(19);
 var ChatConnection = /** @class */ (function () {
     function ChatConnection(user, urlSignalr, onMessage, onPrivateMessage, onUserListChange, onStarted) {
         var _this = this;
@@ -497,11 +540,11 @@ exports.ChatConnection = ChatConnection;
 
 
 /***/ }),
-/* 12 */,
 /* 13 */,
 /* 14 */,
 /* 15 */,
-/* 16 */
+/* 16 */,
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -536,7 +579,7 @@ exports.BinderService = BinderService;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
