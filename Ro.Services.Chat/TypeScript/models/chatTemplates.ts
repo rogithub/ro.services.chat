@@ -5,7 +5,7 @@ import { MessageInfo } from './messageInfo';
 import { ObjectLiteral } from '../shared/objectLiteral';
 
 export class ChatTemplates {
-    public current: KnockoutObservable<string>;
+
     public message: KnockoutObservable<string>;
     public id: KnockoutObservable<string>;
     public chattingWith: KnockoutObservable<ChatUser>;
@@ -24,7 +24,6 @@ export class ChatTemplates {
         this.$ = $;
         this.user = user;
         this.urlSignalr = urlSignalr;
-        this.current = ko.observable<string>("ChatPartial");
         this.message = ko.observable<string>("");
         this.id = ko.observable<string>("");
         this.chattingWith = ko.observable<ChatUser>();
@@ -117,13 +116,24 @@ export class ChatTemplates {
         if (!self.privateMessages[to.id]) {
             self.privateMessages[to.id] = self.ko.observableArray<MessageInfo>();
         }
-        self.current("ChatPartial");
+        self.$('#tabMenu a[href="#nav-chat"]').tab('show');
         self.chattingWith(to);
     }
 
     public afterRender = () => {
         const self = this;
-        self.$('#tabMenu a[href="#chat"]').tab('show')
+        let setup = () => {
+            let txtMessage = self.$("#txtMsg");
+            if (txtMessage.length > 0) {
+                self.autoScroll();
+                txtMessage.focus();
+            }
+        };
+        self.$('#tabMenu a[href="#nav-chat"]').tab('show');
+        self.$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            setup();
+        });
+        setup();
     }
 
 }

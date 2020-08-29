@@ -33,14 +33,11 @@
         </nav>
         <nav class="navbar-dark bg-dark">
             <div class="nav nav-tabs" id="tabMenu" role="tablist">
-                <a data-bind="click: ()=> {
-                                    current('ChatPartial');
-                                    chattingWith(null);
-                    }"
+                <a data-bind="click: ()=> chattingWith(null)"
                 class="nav-link active" id="nav-chat-tab" data-toggle="tab" href="#nav-chat" role="tab" aria-controls="nav-chat" aria-selected="true">
                     Chat
                 </a>
-                <a  data-bind="click: ()=> current('ChatUsersPartial')"
+                <a
                     class="nav-link" id="nav-users-tab" data-toggle="tab" href="#nav-users" role="tab" aria-controls="nav-users" aria-selected="false">
                     Usuarios
                 </a>

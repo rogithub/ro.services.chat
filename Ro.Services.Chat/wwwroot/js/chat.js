@@ -325,18 +325,28 @@ var ChatTemplates = /** @class */ (function () {
             if (!self.privateMessages[to.id]) {
                 self.privateMessages[to.id] = self.ko.observableArray();
             }
-            self.current("ChatPartial");
+            self.$('#tabMenu a[href="#nav-chat"]').tab('show');
             self.chattingWith(to);
         };
         this.afterRender = function () {
             var self = _this;
-            self.$('#tabMenu a[href="#chat"]').tab('show');
+            var setup = function () {
+                var txtMessage = self.$("#txtMsg");
+                if (txtMessage.length > 0) {
+                    self.autoScroll();
+                    txtMessage.focus();
+                }
+            };
+            self.$('#tabMenu a[href="#nav-chat"]').tab('show');
+            self.$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                setup();
+            });
+            setup();
         };
         this.ko = ko;
         this.$ = $;
         this.user = user;
         this.urlSignalr = urlSignalr;
-        this.current = ko.observable("ChatPartial");
         this.message = ko.observable("");
         this.id = ko.observable("");
         this.chattingWith = ko.observable();
