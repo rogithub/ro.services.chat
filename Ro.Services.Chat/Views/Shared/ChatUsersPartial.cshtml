@@ -1,26 +1,32 @@
 
 
 <script type="text/html" id="ChatUsersPartial">
-    <div id="users" class="userscontent">        
-    <!-- ko foreach: users() -->
-        <div class="row">
-            <div class="col">
-                <a href="" class="useritem" data-bind="click: $parent.privateChat.bind($parent)" >
-                    <div class="media">
-                        <svg class="bd-placeholder-img rounded-circle" width="40" height="40" xmlns="http://www.w3.org/2000/svg" 
-                    preserveAspectRatio="xMidYMid slice" focusable="false" role="img" 
-                    aria-label="Placeholder: 140x140"><title>Placeholder</title>
-                    <rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text>
-                    </svg>
+    <div id="users" class="userscontent">     
+    <div class="row">
+        <div class="col">
+            <input data-bind="textInput: usersFilter" 
+            type="text" class="form-control mt-2 mb-4" placeholder="Buscar" />
+        <div>
+    <div>   
+    <!-- ko foreach: filteredUsers() -->
+    <div class="row">
+        <div class="col">
+            <a href="" class="useritem" data-bind="click: $parent.privateChat.bind($parent)" >
+                <div class="media">
+                    <svg class="bd-placeholder-img rounded-circle" width="40" height="40" xmlns="http://www.w3.org/2000/svg" 
+                preserveAspectRatio="xMidYMid slice" focusable="false" role="img" 
+                aria-label="Placeholder: 140x140"><title>Placeholder</title>
+                <rect width="100%" height="100%" fill="#777"/><text x="50%" y="50%" fill="#777" dy=".3em">140x140</text>
+                </svg>
 
-                        <div class="media-body ml-3">
-                            <strong class="mt-0" data-bind="text: name"></strong>
-                            <hr class="featurette-divider">
-                        </div>
+                    <div class="media-body ml-3">
+                        <strong class="mt-0" data-bind="text: name"></strong>
+                        <hr class="featurette-divider">
                     </div>
-                </a>    
-            </div>
+                </div>
+            </a>    
         </div>
+    </div>
     <!-- /ko -->
     </div>
 </script>

@@ -17,6 +17,8 @@ export class ChatTemplates {
     public chatConnection: ChatConnection;
     public messages: KnockoutObservableArray<MessageInfo>;
     public users: KnockoutObservableArray<ChatUser>;
+    public usersFilter: KnockoutObservable<string>;
+    public filteredUsers: KnockoutComputed<ChatUser[]>;
     public privateMessages: ObjectLiteral;
 
     constructor(ko: KnockoutStatic, $: JQueryStatic, user: UserInfo, urlSignalr: string) {
@@ -26,6 +28,7 @@ export class ChatTemplates {
         this.urlSignalr = urlSignalr;
         this.message = ko.observable<string>("");
         this.id = ko.observable<string>("");
+        this.usersFilter = ko.observable<string>("");
         this.chattingWith = ko.observable<ChatUser>();
         this.messages = ko.observableArray<MessageInfo>([]);
         this.users = ko.observableArray<ChatUser>([]);
@@ -41,6 +44,15 @@ export class ChatTemplates {
 
         this.isPublic = ko.pureComputed<boolean>(() => {
             return (self.chattingWith() === null || self.chattingWith() === undefined);
+        }, self);
+        
+        this.filteredUsers = ko.pureComputed<ChatUser[]>(() => {
+            if ($.trim(self.usersFilter()).length === 0) return self.users();
+
+            return ko.utils.arrayFilter(self.users(), 
+                u => u.name.toLocaleLowerCase().indexOf
+                (self.usersFilter().toLocaleLowerCase()) !== -1);
+
         }, self);
     }
 

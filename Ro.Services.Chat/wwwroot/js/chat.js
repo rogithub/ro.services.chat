@@ -349,6 +349,7 @@ var ChatTemplates = /** @class */ (function () {
         this.urlSignalr = urlSignalr;
         this.message = ko.observable("");
         this.id = ko.observable("");
+        this.usersFilter = ko.observable("");
         this.chattingWith = ko.observable();
         this.messages = ko.observableArray([]);
         this.users = ko.observableArray([]);
@@ -358,6 +359,11 @@ var ChatTemplates = /** @class */ (function () {
         this.chatConnection = new chatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onPrivateMessage, self.onUserListChange, self.onStarted);
         this.isPublic = ko.pureComputed(function () {
             return (self.chattingWith() === null || self.chattingWith() === undefined);
+        }, self);
+        this.filteredUsers = ko.pureComputed(function () {
+            if ($.trim(self.usersFilter()).length === 0)
+                return self.users();
+            return ko.utils.arrayFilter(self.users(), function (u) { return u.name.toLocaleLowerCase().indexOf(self.usersFilter().toLocaleLowerCase()) !== -1; });
         }, self);
     }
     return ChatTemplates;
