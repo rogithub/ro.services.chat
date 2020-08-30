@@ -77,7 +77,7 @@ export class ChatTemplates {
 
         let user = self.ko.utils.arrayFirst(self.users(), u => u.id === idFrom);
         if (user === null || user === undefined) {
-            user =new ChatStateUser(self.ko, {
+            user = new ChatStateUser(self.ko, {
                 id: idFrom,
                 name: "Desconectado"
             }, false);
@@ -90,6 +90,15 @@ export class ChatTemplates {
     public onStarted = (id: string) => {
         const self = this;
         self.id(id);
+    }
+
+    public delChat = () => {
+        const self = this;
+        let u = self.chattingWith();
+        if (!u) return;
+        delete self.privateMessages[u.id];
+        self.users(self.ko.utils.arrayFilter(self.users(), x=> x.id !== u.id));
+        self.chattingWith(null);
     }
 
     public onUserListChange = (list: ChatUser[]) => {

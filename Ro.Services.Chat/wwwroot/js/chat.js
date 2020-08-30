@@ -292,6 +292,15 @@ var ChatTemplates = /** @class */ (function () {
             var self = _this;
             self.id(id);
         };
+        this.delChat = function () {
+            var self = _this;
+            var u = self.chattingWith();
+            if (!u)
+                return;
+            delete self.privateMessages[u.id];
+            self.users(self.ko.utils.arrayFilter(self.users(), function (x) { return x.id !== u.id; }));
+            self.chattingWith(null);
+        };
         this.onUserListChange = function (list) {
             var self = _this;
             var connectedIds = self.ko.utils.arrayMap(list, function (u) { return u.id; });
