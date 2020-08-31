@@ -353,7 +353,6 @@ var ChatTemplates = /** @class */ (function () {
             var p = self.$("#mesagges p[data-msg-state=1]:first");
             if (p.length === 0)
                 return;
-            console.log("privados", p.length);
             window.scrollTo(0, p.offset().top);
         };
         this.autoScroll = function () {
@@ -392,6 +391,9 @@ var ChatTemplates = /** @class */ (function () {
                 var txtMessage = self.$("#txtMsg");
                 if (txtMessage.length > 0) {
                     txtMessage.focus();
+                    var scrollfn = self.isPublic() ?
+                        self.autoScroll : self.scrollToFirstNotRead;
+                    scrollfn();
                 }
                 self.checkSeen();
             };
