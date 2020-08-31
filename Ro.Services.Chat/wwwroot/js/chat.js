@@ -306,7 +306,7 @@ var ChatTemplates = /** @class */ (function () {
             }
             var txtMessage = new message_1.TextMessage(self.ko, message);
             self.privateMessages[idFrom].push({ user: user.name, message: txtMessage, isLocal: false });
-            self.autoScroll();
+            self.scrollToFirstNotRead();
             self.chatConnection.sendMessageDelivered(idFrom, message.now);
             self.updateMessageStatus(idFrom, message.now, message_1.Status.Deliverded);
         };
@@ -348,6 +348,14 @@ var ChatTemplates = /** @class */ (function () {
                 self.users.push(new chatUser_1.ChatStateUser(self.ko, u));
             }
         };
+        this.scrollToFirstNotRead = function () {
+            var self = _this;
+            var p = self.$("#mesagges p[data-msg-state=1]:first");
+            if (p.length === 0)
+                return;
+            console.log("privados", p.length);
+            window.scrollTo(0, p.offset().top);
+        };
         this.autoScroll = function () {
             var self = _this;
             var p = self.$("#mesagges p:last");
@@ -383,7 +391,6 @@ var ChatTemplates = /** @class */ (function () {
             var setup = function () {
                 var txtMessage = self.$("#txtMsg");
                 if (txtMessage.length > 0) {
-                    self.autoScroll();
                     txtMessage.focus();
                 }
                 self.checkSeen();
@@ -396,12 +403,10 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.checkSeen = function () {
             var self = _this;
-            console.log("count", self.$("#mesagges p.msgEntrante").length);
             self.$("#mesagges p.msgEntrante").each(function (i, el) {
                 var it = self.$(el);
                 if (it.attr("data-msg-state") === "1" && it.is(":visible")) {
                     var msgData = self.ko.contextFor(el).$data;
-                    console.dir(msgData);
                     msgData.message.state(message_1.Status.Seen);
                     self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
                 }

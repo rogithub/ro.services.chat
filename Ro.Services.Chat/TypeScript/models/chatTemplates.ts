@@ -112,7 +112,7 @@ export class ChatTemplates {
 
         let txtMessage = new TextMessage(self.ko, message);
         self.privateMessages[idFrom].push({ user: user.name, message: txtMessage, isLocal: false });
-        self.autoScroll();
+        self.scrollToFirstNotRead();
 
         self.chatConnection.sendMessageDelivered(idFrom, message.now);
         self.updateMessageStatus(idFrom, message.now, Status.Deliverded);
@@ -160,12 +160,20 @@ export class ChatTemplates {
         }
     }
 
+    public scrollToFirstNotRead = () => {
+        const self = this;
+        let p = self.$("#mesagges p[data-msg-state=1]:first");
+        if (p.length === 0) return;
+
+        window.scrollTo(0, p.offset().top);     
+    }
+
     public autoScroll = () => {
         const self = this;
         let p = self.$("#mesagges p:last");
         if (p.length === 0) return;
 
-        window.scrollTo(0, p.offset().top);
+        window.scrollTo(0, p.offset().top);     
     }
 
     public sendMessage = () => {
@@ -203,7 +211,6 @@ export class ChatTemplates {
         let setup = () => {
             let txtMessage = self.$("#txtMsg");
             if (txtMessage.length > 0) {
-                self.autoScroll();
                 txtMessage.focus();
             }
             self.checkSeen();
@@ -217,14 +224,12 @@ export class ChatTemplates {
 
     public checkSeen = () => {
         const self = this;
-        console.log("count", self.$("#mesagges p.msgEntrante").length);
 
         self.$("#mesagges p.msgEntrante").each((i, el) => {
             let it = self.$(el);
             if (it.attr("data-msg-state") === "1" && it.is(":visible")) {
                 let msgData = self.ko.contextFor(el).$data;
-                console.dir(msgData);
-
+                
                 msgData.message.state(Status.Seen);
                 self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
             }
