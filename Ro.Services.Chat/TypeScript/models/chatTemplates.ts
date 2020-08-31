@@ -216,4 +216,14 @@ export class ChatTemplates {
         setup();
     }
 
+    public onMessageScroll = (m: MessageInfo, event: Event) => {
+        const self = this;
+        if (m.message.state() !== Status.Deliverded) return;
+
+        if (self.$(event.target).is("visible")) {
+            m.message.state(Status.Seen);
+            self.chatConnection.sendMessageSeen(self.id(), m.message.now);
+        }
+    }
+
 }
