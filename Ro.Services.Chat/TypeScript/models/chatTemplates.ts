@@ -199,21 +199,20 @@ export class ChatTemplates {
 
     public afterRender = () => {
         const self = this;
-        let txtMessage = self.$("#txtMsg");
 
         let setup = () => {
+            let txtMessage = self.$("#txtMsg");
             if (txtMessage.length > 0) {
                 self.autoScroll();
                 txtMessage.focus();
             }
+            self.checkSeen();
         };
         self.$('#tabMenu a[href="#nav-chat"]').tab('show');
         self.$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             setup();
         });
         setup();
-
-        txtMessage.on("focus", self.checkSeen.bind(self));
     }
 
     public checkSeen = () => {

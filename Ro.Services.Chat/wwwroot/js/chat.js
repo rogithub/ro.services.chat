@@ -380,19 +380,19 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.afterRender = function () {
             var self = _this;
-            var txtMessage = self.$("#txtMsg");
             var setup = function () {
+                var txtMessage = self.$("#txtMsg");
                 if (txtMessage.length > 0) {
                     self.autoScroll();
                     txtMessage.focus();
                 }
+                self.checkSeen();
             };
             self.$('#tabMenu a[href="#nav-chat"]').tab('show');
             self.$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                 setup();
             });
             setup();
-            txtMessage.on("focus", self.checkSeen.bind(self));
         };
         this.checkSeen = function () {
             var self = _this;
