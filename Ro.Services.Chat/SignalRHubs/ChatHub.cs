@@ -50,5 +50,14 @@ namespace Ro.Services.Chat.SignalRHubs
             await Clients.Client(id).SendAsync("ReceivePrivateMessage", Context.ConnectionId, message);
         }
 
+        public async Task SendMessageDelivered(string userId, Int64 messageId)
+        {
+            await Clients.Client(userId).SendAsync("ReceiveMessageDelivered", Context.ConnectionId, messageId);
+        }
+
+        public async Task SendMessageSeen(string userId, Int64 messageId)
+        {
+            await Clients.Client(userId).SendAsync("ReceiveMessageSeen", Context.ConnectionId, messageId);
+        }
     }
 }

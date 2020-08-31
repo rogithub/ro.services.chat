@@ -14,6 +14,8 @@ export class ChatConnection {
         urlSignalr: string,
         onMessage: (user: string, message: Message) => void,
         onPrivateMessage: (id: string, message: Message) => void,
+        onReceiveMessageDelivered: (userId: string, messageId: number) => void,
+        onReceiveMessageSeen: (userId: string, messageId: number) => void,
         onUserListChange: (list: ChatUser[]) => void,
         onStarted: (id: string) => void) {
         this.user = user;
@@ -31,6 +33,8 @@ export class ChatConnection {
 
         self.connection.on("ReceiveMessage", onMessage);
         self.connection.on("ReceivePrivateMessage", onPrivateMessage);
+        self.connection.on("ReceiveMessageDelivered", onReceiveMessageDelivered);
+        self.connection.on("ReceiveMessageSeen", onReceiveMessageSeen);
         self.connection.on("UsersListChange", onUserListChange);
         self.connection.on("SetOwnId", onStarted);
     }
@@ -43,6 +47,16 @@ export class ChatConnection {
     sendTo = async (msg: Message, id: string) => {
         const self = this;
         self.connection.invoke("SendMessageTo", id, msg);
+    };
+
+    sendMessageDelivered = async (userId: string, messageId: number) => {
+        const self = this;
+        self.connection.invoke("SendMessageDelivered", userId, messageId);
+    };
+
+    sendMessageSeen = async (userId: string, messageId: number) => {
+        const self = this;
+        self.connection.invoke("SendMessageSeen", userId, messageId);
     };
 
     setInfo = async () => {

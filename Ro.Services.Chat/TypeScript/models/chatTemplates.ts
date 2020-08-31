@@ -2,7 +2,7 @@ import { UserInfo } from '../models/userInfo';
 import { ChatUser, ChatStateUser } from '../models/chatUser';
 import { ChatConnection } from './chatConnection';
 import { ObjectLiteral } from '../shared/objectLiteral';
-import { MessageInfo, TextMessage, Message } from './message';
+import { MessageInfo, TextMessage, Message, Status } from './message';
 
 export class ChatTemplates {
 
@@ -39,6 +39,8 @@ export class ChatTemplates {
             user, urlSignalr,
             self.onMessage,
             self.onPrivateMessage,
+            self.onReceiveMessageDelivered,
+            self.onReceiveMessageSeen,
             self.onUserListChange,
             self.onStarted);
 
@@ -68,6 +70,33 @@ export class ChatTemplates {
         self.autoScroll();
     }
 
+    private updateMessageStatus = (userId: string, messageId: number, state: Status) => {
+        const self = this;
+
+        if (!self.privateMessages[userId]) {
+            return;
+        }
+
+        let found = self.ko.utils.arrayFilter(self.privateMessages[userId](), (it: MessageInfo) => {
+            return it.message.now === messageId;
+        });
+
+        if (found.length > 0) {
+            found[0].message.state(state);
+        }
+
+    }
+
+    public onReceiveMessageDelivered = (userId: string, messageId: number) => {
+        const self = this;
+        self.updateMessageStatus(userId, messageId, Status.Deliverded);
+    }
+
+    public onReceiveMessageSeen = (userId: string, messageId: number) => {
+        const self = this;
+        self.updateMessageStatus(userId, messageId, Status.Seen);
+    }
+
     public onPrivateMessage = (idFrom: string, message: Message) => {
         const self = this;
 
@@ -86,6 +115,8 @@ export class ChatTemplates {
         let txtMessage = new TextMessage(self.ko, message);
         self.privateMessages[idFrom].push({ user: user.name, message: txtMessage, isLocal: false });
         self.autoScroll();
+
+        self.chatConnection.sendMessageDelivered(self.id(), message.now);
     }
 
     public onStarted = (id: string) => {
