@@ -116,7 +116,7 @@ export class ChatTemplates {
         self.privateMessages[idFrom].push({ user: user.name, message: txtMessage, isLocal: false });
         self.autoScroll();
 
-        self.chatConnection.sendMessageDelivered(self.id(), message.now);
+        self.chatConnection.sendMessageDelivered(idFrom, message.now);
     }
 
     public onStarted = (id: string) => {
@@ -218,9 +218,13 @@ export class ChatTemplates {
 
     public onMessageScroll = (m: MessageInfo, event: Event) => {
         const self = this;
+        if (m.isLocal) return;
+
+        console.log("scrolling ", m.message.state());
         if (m.message.state() !== Status.Deliverded) return;
 
         if (self.$(event.target).is("visible")) {
+            console.log("visible ", m.message.content);
             m.message.state(Status.Seen);
             self.chatConnection.sendMessageSeen(self.id(), m.message.now);
         }

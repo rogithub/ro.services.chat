@@ -274,6 +274,26 @@ var ChatTemplates = /** @class */ (function () {
             self.messages.push({ user: user, message: new message_1.TextMessage(self.ko, message), isLocal: false });
             self.autoScroll();
         };
+        this.updateMessageStatus = function (userId, messageId, state) {
+            var self = _this;
+            if (!self.privateMessages[userId]) {
+                return;
+            }
+            var found = self.ko.utils.arrayFilter(self.privateMessages[userId](), function (it) {
+                return it.message.now === messageId;
+            });
+            if (found.length > 0) {
+                found[0].message.state(state);
+            }
+        };
+        this.onReceiveMessageDelivered = function (userId, messageId) {
+            var self = _this;
+            self.updateMessageStatus(userId, messageId, message_1.Status.Deliverded);
+        };
+        this.onReceiveMessageSeen = function (userId, messageId) {
+            var self = _this;
+            self.updateMessageStatus(userId, messageId, message_1.Status.Seen);
+        };
         this.onPrivateMessage = function (idFrom, message) {
             var self = _this;
             if (!self.privateMessages[idFrom]) {
@@ -289,6 +309,7 @@ var ChatTemplates = /** @class */ (function () {
             var txtMessage = new message_1.TextMessage(self.ko, message);
             self.privateMessages[idFrom].push({ user: user.name, message: txtMessage, isLocal: false });
             self.autoScroll();
+            self.chatConnection.sendMessageDelivered(idFrom, message.now);
         };
         this.onStarted = function (id) {
             var self = _this;
@@ -375,6 +396,19 @@ var ChatTemplates = /** @class */ (function () {
             });
             setup();
         };
+        this.onMessageScroll = function (m, event) {
+            var self = _this;
+            if (m.isLocal)
+                return;
+            console.log("scrolling ", m.message.state());
+            if (m.message.state() !== message_1.Status.Deliverded)
+                return;
+            if (self.$(event.target).is("visible")) {
+                console.log("visible ", m.message.content);
+                m.message.state(message_1.Status.Seen);
+                self.chatConnection.sendMessageSeen(self.id(), m.message.now);
+            }
+        };
         this.ko = ko;
         this.$ = $;
         this.user = user;
@@ -388,7 +422,7 @@ var ChatTemplates = /** @class */ (function () {
         this.privateMessages = {};
         $("#txtMsg").focus();
         var self = this;
-        this.chatConnection = new chatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onPrivateMessage, self.onUserListChange, self.onStarted);
+        this.chatConnection = new chatConnection_1.ChatConnection(user, urlSignalr, self.onMessage, self.onPrivateMessage, self.onReceiveMessageDelivered, self.onReceiveMessageSeen, self.onUserListChange, self.onStarted);
         this.isPublic = ko.pureComputed(function () {
             return (self.chattingWith() === null || self.chattingWith() === undefined);
         }, self);
@@ -472,7 +506,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatConnection = void 0;
 var signalR = __webpack_require__(20);
 var ChatConnection = /** @class */ (function () {
-    function ChatConnection(user, urlSignalr, onMessage, onPrivateMessage, onUserListChange, onStarted) {
+    function ChatConnection(user, urlSignalr, onMessage, onPrivateMessage, onReceiveMessageDelivered, onReceiveMessageSeen, onUserListChange, onStarted) {
         var _this = this;
         this.send = function (msg) { return __awaiter(_this, void 0, void 0, function () {
             var self;
@@ -487,6 +521,22 @@ var ChatConnection = /** @class */ (function () {
             return __generator(this, function (_a) {
                 self = this;
                 self.connection.invoke("SendMessageTo", id, msg);
+                return [2 /*return*/];
+            });
+        }); };
+        this.sendMessageDelivered = function (userId, messageId) { return __awaiter(_this, void 0, void 0, function () {
+            var self;
+            return __generator(this, function (_a) {
+                self = this;
+                self.connection.invoke("SendMessageDelivered", userId, messageId);
+                return [2 /*return*/];
+            });
+        }); };
+        this.sendMessageSeen = function (userId, messageId) { return __awaiter(_this, void 0, void 0, function () {
+            var self;
+            return __generator(this, function (_a) {
+                self = this;
+                self.connection.invoke("SendMessageSeen", userId, messageId);
                 return [2 /*return*/];
             });
         }); };
@@ -543,6 +593,8 @@ var ChatConnection = /** @class */ (function () {
         }); });
         self.connection.on("ReceiveMessage", onMessage);
         self.connection.on("ReceivePrivateMessage", onPrivateMessage);
+        self.connection.on("ReceiveMessageDelivered", onReceiveMessageDelivered);
+        self.connection.on("ReceiveMessageSeen", onReceiveMessageSeen);
         self.connection.on("UsersListChange", onUserListChange);
         self.connection.on("SetOwnId", onStarted);
     }
