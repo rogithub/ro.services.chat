@@ -115,6 +115,7 @@ export class ChatTemplates {
         self.autoScroll();
 
         self.chatConnection.sendMessageDelivered(idFrom, message.now);
+        self.updateMessageStatus(idFrom, message.now, Status.Deliverded);
     }
 
     public onStarted = (id: string) => {
@@ -198,8 +199,9 @@ export class ChatTemplates {
 
     public afterRender = () => {
         const self = this;
+        let txtMessage = self.$("#txtMsg");
+
         let setup = () => {
-            let txtMessage = self.$("#txtMsg");
             if (txtMessage.length > 0) {
                 self.autoScroll();
                 txtMessage.focus();
@@ -210,14 +212,16 @@ export class ChatTemplates {
             setup();
         });
         setup();
+
+        txtMessage.on("focus", self.checkSeen.bind(self));
     }
 
-    public afterMsgRender = (elements: HTMLElement[]) => {
+    public checkSeen = () => {
         const self = this;
-        if (self.isPublic() === false) return;
+        console.log("count", self.$("#mesagges p.msgEntrante").length);
 
-        for (let el of elements) {
-            let it = self.$(el).find("p.msgSaliente:first");
+        self.$("#mesagges p.msgEntrante").each((i, el) => {
+            let it = self.$(el);
             if (it.attr("data-msg-state") === "1" && it.is(":visible")) {
                 let msgData = self.ko.contextFor(el).$data;
                 console.dir(msgData);
@@ -225,7 +229,7 @@ export class ChatTemplates {
                 msgData.message.state(Status.Seen);
                 self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
             }
-        }
+        });
     }
 
     public createPrivateChat = (withId: string) => {

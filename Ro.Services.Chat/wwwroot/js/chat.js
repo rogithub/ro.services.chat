@@ -308,6 +308,7 @@ var ChatTemplates = /** @class */ (function () {
             self.privateMessages[idFrom].push({ user: user.name, message: txtMessage, isLocal: false });
             self.autoScroll();
             self.chatConnection.sendMessageDelivered(idFrom, message.now);
+            self.updateMessageStatus(idFrom, message.now, message_1.Status.Deliverded);
         };
         this.onStarted = function (id) {
             var self = _this;
@@ -379,8 +380,8 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.afterRender = function () {
             var self = _this;
+            var txtMessage = self.$("#txtMsg");
             var setup = function () {
-                var txtMessage = self.$("#txtMsg");
                 if (txtMessage.length > 0) {
                     self.autoScroll();
                     txtMessage.focus();
@@ -391,21 +392,20 @@ var ChatTemplates = /** @class */ (function () {
                 setup();
             });
             setup();
+            txtMessage.on("focus", self.checkSeen.bind(self));
         };
-        this.afterMsgRender = function (elements) {
+        this.checkSeen = function () {
             var self = _this;
-            if (self.isPublic() === false)
-                return;
-            for (var _i = 0, elements_1 = elements; _i < elements_1.length; _i++) {
-                var el = elements_1[_i];
-                var it = self.$(el).find("p.msgSaliente:first");
+            console.log("count", self.$("#mesagges p.msgEntrante").length);
+            self.$("#mesagges p.msgEntrante").each(function (i, el) {
+                var it = self.$(el);
                 if (it.attr("data-msg-state") === "1" && it.is(":visible")) {
                     var msgData = self.ko.contextFor(el).$data;
                     console.dir(msgData);
                     msgData.message.state(message_1.Status.Seen);
                     self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
                 }
-            }
+            });
         };
         this.createPrivateChat = function (withId) {
             var self = _this;
