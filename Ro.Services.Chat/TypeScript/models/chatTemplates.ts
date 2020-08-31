@@ -216,7 +216,7 @@ export class ChatTemplates {
         setup();
     }
 
-    public onMessageScroll = (m: MessageInfo, event: Event) => {
+    public checkIfSeen = (m: MessageInfo, event: Event) => {
         const self = this;
         if (m.isLocal) return;
 
@@ -228,6 +228,10 @@ export class ChatTemplates {
             m.message.state(Status.Seen);
             self.chatConnection.sendMessageSeen(self.id(), m.message.now);
         }
+    }
+
+    public onMessagesScroll = (m: ChatTemplates, event: Event) => {
+        console.log("Scrolled");
     }
 
 }

@@ -396,7 +396,7 @@ var ChatTemplates = /** @class */ (function () {
             });
             setup();
         };
-        this.onMessageScroll = function (m, event) {
+        this.checkIfSeen = function (m, event) {
             var self = _this;
             if (m.isLocal)
                 return;
@@ -408,6 +408,9 @@ var ChatTemplates = /** @class */ (function () {
                 m.message.state(message_1.Status.Seen);
                 self.chatConnection.sendMessageSeen(self.id(), m.message.now);
             }
+        };
+        this.onMessagesScroll = function (m, event) {
+            console.log("Scrolled");
         };
         this.ko = ko;
         this.$ = $;

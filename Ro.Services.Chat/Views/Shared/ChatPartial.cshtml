@@ -1,7 +1,7 @@
 
 
 <script type="text/html" id="ChatPartial">
-    <div id="mesagges" class="chatcontent">   
+    <div id="mesagges" class="chatcontent" data-bind="event: { scroll: onMessagesScroll.bind($data) }">   
 
     <!-- ko foreach: isPublic() ? messages() : privateMessages[chattingWith().id]() -->
     <!-- ko template: { name: $parent.isPublic() ? 'TextMessage' : 'PrivateTextMessage' } -->
@@ -53,7 +53,7 @@
         <p class="alert" data-bind="css:  { 
                             'msgSaliente': isLocal,
                             'msgEntrante': !isLocal,
-                        }, event: { scroll: $parent.onMessageScroll.bind($parent) }">
+                        }">
             <span data-bind="text: message.content"></span>
 
             <small class="text-muted" data-bind="text: message.time"></small>
