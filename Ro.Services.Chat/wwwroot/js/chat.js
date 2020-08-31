@@ -206,8 +206,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var chatTemplates_1 = __webpack_require__(10);
-var binderService_1 = __webpack_require__(17);
-var jsonReq_1 = __webpack_require__(18);
+var binderService_1 = __webpack_require__(18);
+var jsonReq_1 = __webpack_require__(19);
 var urlBase = $("#urlBase").val();
 var urlHome = $("#urlHome").val();
 var urlSignalr = urlBase + "/chathub";
@@ -265,12 +265,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatTemplates = void 0;
 var chatUser_1 = __webpack_require__(11);
 var chatConnection_1 = __webpack_require__(12);
+var message_1 = __webpack_require__(17);
 var ChatTemplates = /** @class */ (function () {
     function ChatTemplates(ko, $, user, urlSignalr) {
         var _this = this;
         this.onMessage = function (user, message) {
             var self = _this;
-            self.messages.push({ user: user, message: message, isLocal: false, date: new Date() });
+            self.messages.push({ user: user, message: new message_1.TextMessage(self.ko, message), isLocal: false });
             self.autoScroll();
         };
         this.onPrivateMessage = function (idFrom, message) {
@@ -285,7 +286,8 @@ var ChatTemplates = /** @class */ (function () {
                     name: "Desconectado"
                 }, false);
             }
-            self.privateMessages[idFrom].push({ user: user.name, message: message, isLocal: false, date: new Date() });
+            var txtMessage = new message_1.TextMessage(self.ko, message);
+            self.privateMessages[idFrom].push({ user: user.name, message: txtMessage, isLocal: false });
             self.autoScroll();
         };
         this.onStarted = function (id) {
@@ -339,8 +341,9 @@ var ChatTemplates = /** @class */ (function () {
             var msg = self.message();
             if (self.$.trim(msg).length > 0) {
                 var isPublic = self.isPublic();
-                var item = { user: self.user.name, message: msg, isLocal: true, date: new Date() };
-                var send = isPublic ? function () { return self.chatConnection.send(msg); } : function () { return self.chatConnection.sendTo(msg, self.chattingWith().id); };
+                var sentMessage_1 = message_1.TextMessage.createSent(msg);
+                var item = { user: self.user.name, message: new message_1.TextMessage(self.ko, sentMessage_1), isLocal: true };
+                var send = isPublic ? function () { return self.chatConnection.send(sentMessage_1); } : function () { return self.chatConnection.sendTo(sentMessage_1, self.chattingWith().id); };
                 var list = isPublic ? self.messages : self.privateMessages[self.chattingWith().id];
                 send();
                 list.push(item);
@@ -467,7 +470,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatConnection = void 0;
-var signalR = __webpack_require__(19);
+var signalR = __webpack_require__(20);
 var ChatConnection = /** @class */ (function () {
     function ChatConnection(user, urlSignalr, onMessage, onPrivateMessage, onUserListChange, onStarted) {
         var _this = this;
@@ -559,6 +562,48 @@ exports.ChatConnection = ChatConnection;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TextMessage = exports.Status = void 0;
+var Status;
+(function (Status) {
+    Status[Status["Sent"] = 0] = "Sent";
+    Status[Status["Deliverded"] = 1] = "Deliverded";
+    Status[Status["Seen"] = 2] = "Seen";
+})(Status = exports.Status || (exports.Status = {}));
+var TextMessage = /** @class */ (function () {
+    function TextMessage(ko, message) {
+        this.ko = ko;
+        this.content = message.content;
+        this.now = message.now;
+        this.state = ko.observable(message.state);
+        var self = this;
+        this.time = ko.pureComputed(function () {
+            var d = new Date(self.now);
+            return d.toLocaleTimeString('en-US', {
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }, self);
+    }
+    TextMessage.createSent = function (content) {
+        return {
+            now: Date.now(),
+            content: content,
+            state: Status.Sent
+        };
+    };
+    return TextMessage;
+}());
+exports.TextMessage = TextMessage;
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.BinderService = void 0;
 /** Helper class that binds one Knockout models to a DOM object */
 var BinderService = /** @class */ (function () {
@@ -588,7 +633,7 @@ exports.BinderService = BinderService;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

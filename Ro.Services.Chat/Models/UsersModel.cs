@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -12,6 +13,20 @@ namespace Ro.Services.Chat.Models
     {
         public string Name { get; set; }
         public string Group { get; set; }
+    }
+
+    public enum Status
+    {
+        Sent,
+        Deliverded,
+        Seen
+    }
+
+    public class TextMessage
+    {
+        public Status State { get; set; }
+        public string Content { get; set; }
+        public Int64 Now { get; set; }
     }
 
     public class ChatUser

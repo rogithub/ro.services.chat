@@ -1,8 +1,8 @@
 import { UserInfo } from '../models/userInfo';
 import { ChatUser, ChatStateUser } from '../models/chatUser';
 import { ChatConnection } from './chatConnection';
-import { MessageInfo } from './messageInfo';
 import { ObjectLiteral } from '../shared/objectLiteral';
+import { MessageInfo, TextMessage, Message } from './message';
 
 export class ChatTemplates {
 
@@ -45,30 +45,30 @@ export class ChatTemplates {
         this.isPublic = ko.pureComputed<boolean>(() => {
             return (self.chattingWith() === null || self.chattingWith() === undefined);
         }, self);
-        
+
         this.filteredUsers = ko.pureComputed<ChatStateUser[]>(() => {
-            if 
-            (
+            if
+                (
                 self.usersFilter() === null ||
                 self.usersFilter() === undefined ||
                 self.usersFilter() === "" ||
                 $.trim(self.usersFilter()).length === 0
             ) return self.users();
 
-            return ko.utils.arrayFilter(self.users(), 
+            return ko.utils.arrayFilter(self.users(),
                 u => u.name.toLocaleLowerCase().indexOf
-                (self.usersFilter().toLocaleLowerCase()) !== -1);
+                    (self.usersFilter().toLocaleLowerCase()) !== -1);
 
         }, self);
     }
 
-    public onMessage = (user: string, message: string) => {
+    public onMessage = (user: string, message: Message) => {
         const self = this;
-        self.messages.push({ user, message, isLocal: false, date: new Date() });
+        self.messages.push({ user, message: new TextMessage(self.ko, message), isLocal: false });
         self.autoScroll();
     }
 
-    public onPrivateMessage = (idFrom: string, message: string) => {
+    public onPrivateMessage = (idFrom: string, message: Message) => {
         const self = this;
 
         if (!self.privateMessages[idFrom]) {
@@ -83,7 +83,8 @@ export class ChatTemplates {
             }, false);
         }
 
-        self.privateMessages[idFrom].push({ user: user.name, message, isLocal: false, date: new Date() });
+        let txtMessage = new TextMessage(self.ko, message);
+        self.privateMessages[idFrom].push({ user: user.name, message: txtMessage, isLocal: false });
         self.autoScroll();
     }
 
@@ -97,7 +98,7 @@ export class ChatTemplates {
         let u = self.chattingWith();
         if (!u) return;
         delete self.privateMessages[u.id];
-        self.users(self.ko.utils.arrayFilter(self.users(), x=> x.id !== u.id));
+        self.users(self.ko.utils.arrayFilter(self.users(), x => x.id !== u.id));
         self.chattingWith(null);
     }
 
@@ -109,24 +110,22 @@ export class ChatTemplates {
         let rescued = self.ko.utils.arrayFilter(self.users(), u => {
             let disconected = connectedIds.indexOf(u.id) === -1;
             if (disconected === false) return false;
-                        
+
             let emptyMessages = (self.privateMessages[u.id] === null ||
-                self.privateMessages[u.id] === undefined); 
-                
+                self.privateMessages[u.id] === undefined);
+
             if (emptyMessages) return false;
 
             return self.privateMessages[u.id]().length > 0;
         });
 
-        self.users.removeAll();        
-        for (let u of rescued)
-        {
+        self.users.removeAll();
+        for (let u of rescued) {
             u.connected(false);
         }
         self.users(rescued);
-        let others = self.ko.utils.arrayFilter(list, u => u.id !== self.id());        
-        for (let u of others)
-        {
+        let others = self.ko.utils.arrayFilter(list, u => u.id !== self.id());
+        for (let u of others) {
             self.users.push(new ChatStateUser(self.ko, u));
         }
     }
@@ -146,8 +145,9 @@ export class ChatTemplates {
 
         if (self.$.trim(msg).length > 0) {
             const isPublic = self.isPublic();
-            const item: MessageInfo = { user: self.user.name, message: msg, isLocal: true, date: new Date() };
-            let send = isPublic ? () => self.chatConnection.send(msg) : () => self.chatConnection.sendTo(msg, self.chattingWith().id);
+            let sentMessage = TextMessage.createSent(msg);
+            const item: MessageInfo = { user: self.user.name, message: new TextMessage(self.ko, sentMessage), isLocal: true };
+            let send = isPublic ? () => self.chatConnection.send(sentMessage) : () => self.chatConnection.sendTo(sentMessage, self.chattingWith().id);
             let list: KnockoutObservableArray<MessageInfo> = isPublic ? self.messages : self.privateMessages[self.chattingWith().id];
 
             send();

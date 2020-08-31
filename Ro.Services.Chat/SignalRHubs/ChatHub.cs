@@ -40,12 +40,12 @@ namespace Ro.Services.Chat.SignalRHubs
             await Clients.OthersInGroup(info.Group).SendAsync("UsersListChange", Connected.GetUsers(info.Group));
         }
 
-        public async Task SendMessage(UserInfo user, string message)
+        public async Task SendMessage(UserInfo user, TextMessage message)
         {
             await Clients.OthersInGroup(user.Group).SendAsync("ReceiveMessage", user.Name, message);
         }
 
-        public async Task SendMessageTo(string id, string message)
+        public async Task SendMessageTo(string id, TextMessage message)
         {
             await Clients.Client(id).SendAsync("ReceivePrivateMessage", Context.ConnectionId, message);
         }

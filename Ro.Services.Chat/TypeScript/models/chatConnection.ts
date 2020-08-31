@@ -1,6 +1,7 @@
 import { UserInfo } from './userInfo';
 import { ChatUser } from './chatUser';
 import * as signalR from '@microsoft/signalr';
+import { Message } from './message';
 
 export class ChatConnection {
     public urlSignalr: string;
@@ -11,8 +12,8 @@ export class ChatConnection {
     constructor(
         user: UserInfo,
         urlSignalr: string,
-        onMessage: (user: string, message: string) => void,
-        onPrivateMessage: (id: string, message: string) => void,
+        onMessage: (user: string, message: Message) => void,
+        onPrivateMessage: (id: string, message: Message) => void,
         onUserListChange: (list: ChatUser[]) => void,
         onStarted: (id: string) => void) {
         this.user = user;
@@ -34,12 +35,12 @@ export class ChatConnection {
         self.connection.on("SetOwnId", onStarted);
     }
 
-    send = async (msg: string) => {
+    send = async (msg: Message) => {
         const self = this;
         self.connection.invoke("SendMessage", self.user, msg);
     };
 
-    sendTo = async (msg: string, id: string) => {
+    sendTo = async (msg: Message, id: string) => {
         const self = this;
         self.connection.invoke("SendMessageTo", id, msg);
     };
