@@ -212,6 +212,9 @@ export class ChatTemplates {
             let txtMessage = self.$("#txtMsg");
             if (txtMessage.length > 0) {
                 txtMessage.focus();
+                let scrollfn = self.isPublic() ?
+                self.autoScroll: self.scrollToFirstNotRead;
+                scrollfn();
             }
             self.checkSeen();
         };
