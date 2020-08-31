@@ -100,9 +100,7 @@ export class ChatTemplates {
     public onPrivateMessage = (idFrom: string, message: Message) => {
         const self = this;
 
-        if (!self.privateMessages[idFrom]) {
-            self.privateMessages[idFrom] = self.ko.observableArray<MessageInfo>();
-        }
+        self.createPrivateChat(idFrom);
 
         let user = self.ko.utils.arrayFirst(self.users(), u => u.id === idFrom);
         if (user === null || user === undefined) {
@@ -193,9 +191,7 @@ export class ChatTemplates {
 
     public privateChat = (to: ChatStateUser) => {
         const self = this;
-        if (!self.privateMessages[to.id]) {
-            self.privateMessages[to.id] = self.ko.observableArray<MessageInfo>();
-        }
+        self.createPrivateChat(to.id);
         self.$('#tabMenu a[href="#nav-chat"]').tab('show');
         self.chattingWith(to);
     }
@@ -216,22 +212,27 @@ export class ChatTemplates {
         setup();
     }
 
-    public checkIfSeen = (m: MessageInfo, event: Event) => {
+    public afterMsgRender = (elements: HTMLElement[]) => {
         const self = this;
-        if (m.isLocal) return;
+        if (self.isPublic() === false) return;
 
-        console.log("scrolling ", m.message.state());
-        if (m.message.state() !== Status.Deliverded) return;
+        for (let el of elements) {
+            let it = self.$(el).find("p.msgSaliente:first");
+            if (it.attr("data-msg-state") === "1" && it.is(":visible")) {
+                let msgData = self.ko.contextFor(el).$data;
+                console.dir(msgData);
 
-        if (self.$(event.target).is("visible")) {
-            console.log("visible ", m.message.content);
-            m.message.state(Status.Seen);
-            self.chatConnection.sendMessageSeen(self.id(), m.message.now);
+                msgData.message.state(Status.Seen);
+                self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
+            }
         }
     }
 
-    public onMessagesScroll = (m: ChatTemplates, event: Event) => {
-        console.log("Scrolled");
+    public createPrivateChat = (withId: string) => {
+        const self = this;
+        if (!self.privateMessages[withId]) {
+            self.privateMessages[withId] = self.ko.observableArray<MessageInfo>();
+        }
     }
 
 }

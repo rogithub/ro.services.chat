@@ -296,9 +296,7 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.onPrivateMessage = function (idFrom, message) {
             var self = _this;
-            if (!self.privateMessages[idFrom]) {
-                self.privateMessages[idFrom] = self.ko.observableArray();
-            }
+            self.createPrivateChat(idFrom);
             var user = self.ko.utils.arrayFirst(self.users(), function (u) { return u.id === idFrom; });
             if (user === null || user === undefined) {
                 user = new chatUser_1.ChatStateUser(self.ko, {
@@ -375,9 +373,7 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.privateChat = function (to) {
             var self = _this;
-            if (!self.privateMessages[to.id]) {
-                self.privateMessages[to.id] = self.ko.observableArray();
-            }
+            self.createPrivateChat(to.id);
             self.$('#tabMenu a[href="#nav-chat"]').tab('show');
             self.chattingWith(to);
         };
@@ -396,21 +392,26 @@ var ChatTemplates = /** @class */ (function () {
             });
             setup();
         };
-        this.checkIfSeen = function (m, event) {
+        this.afterMsgRender = function (elements) {
             var self = _this;
-            if (m.isLocal)
+            if (self.isPublic() === false)
                 return;
-            console.log("scrolling ", m.message.state());
-            if (m.message.state() !== message_1.Status.Deliverded)
-                return;
-            if (self.$(event.target).is("visible")) {
-                console.log("visible ", m.message.content);
-                m.message.state(message_1.Status.Seen);
-                self.chatConnection.sendMessageSeen(self.id(), m.message.now);
+            for (var _i = 0, elements_1 = elements; _i < elements_1.length; _i++) {
+                var el = elements_1[_i];
+                var it = self.$(el).find("p.msgSaliente:first");
+                if (it.attr("data-msg-state") === "1" && it.is(":visible")) {
+                    var msgData = self.ko.contextFor(el).$data;
+                    console.dir(msgData);
+                    msgData.message.state(message_1.Status.Seen);
+                    self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
+                }
             }
         };
-        this.onMessagesScroll = function (m, event) {
-            console.log("Scrolled");
+        this.createPrivateChat = function (withId) {
+            var self = _this;
+            if (!self.privateMessages[withId]) {
+                self.privateMessages[withId] = self.ko.observableArray();
+            }
         };
         this.ko = ko;
         this.$ = $;

@@ -1,10 +1,12 @@
 
 
 <script type="text/html" id="ChatPartial">
-    <div id="mesagges" class="chatcontent" data-bind="event: { scroll: onMessagesScroll.bind($data) }">   
+    <div id="mesagges" class="chatcontent">
 
     <!-- ko foreach: isPublic() ? messages() : privateMessages[chattingWith().id]() -->
-    <!-- ko template: { name: $parent.isPublic() ? 'TextMessage' : 'PrivateTextMessage' } -->
+    <!-- ko template: { 
+        name: $parent.isPublic() ? 'TextMessage' : 'PrivateTextMessage',
+        afterRender: $parent.afterMsgRender.bind($parent) } -->
     <!-- /ko -->
     <!-- /ko --> 
 
@@ -53,6 +55,8 @@
         <p class="alert" data-bind="css:  { 
                             'msgSaliente': isLocal,
                             'msgEntrante': !isLocal,
+                        }, attr: {                             
+                            'data-msg-state': message.state()
                         }">
             <span data-bind="text: message.content"></span>
 
