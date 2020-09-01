@@ -228,7 +228,7 @@ export class ChatTemplates {
     public checkSeen = () => {
         const self = this;
 
-        self.$("#mesagges p.msgEntrante").each((i, el) => {
+        let fn = () => self.$("#mesagges p.msgEntrante").each((i, el) => {
             let it = self.$(el);
             if (it.attr("data-msg-state") === "1" && it.is(":visible")) {
                 let msgData = self.ko.contextFor(el).$data;
@@ -237,6 +237,9 @@ export class ChatTemplates {
                 self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
             }
         });
+
+        // give time to the scroll.
+        setTimeout(fn, 500);
     }
 
     public createPrivateChat = (withId: string) => {
