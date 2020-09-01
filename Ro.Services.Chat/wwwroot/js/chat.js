@@ -405,14 +405,16 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.checkSeen = function () {
             var self = _this;
-            self.$("#mesagges p.msgEntrante").each(function (i, el) {
+            var fn = function () { return self.$("#mesagges p.msgEntrante").each(function (i, el) {
                 var it = self.$(el);
                 if (it.attr("data-msg-state") === "1" && it.is(":visible")) {
                     var msgData = self.ko.contextFor(el).$data;
                     msgData.message.state(message_1.Status.Seen);
                     self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
                 }
-            });
+            }); };
+            // give time to the scroll.
+            setTimeout(fn, 500);
         };
         this.createPrivateChat = function (withId) {
             var self = _this;
