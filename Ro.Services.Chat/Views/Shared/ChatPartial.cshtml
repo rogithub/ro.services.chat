@@ -5,13 +5,12 @@
 
     <!-- ko foreach: isPublic() ? messages() : privateMessages[chattingWith().id]() -->
     <!-- ko template: { 
-        name: $parent.isPublic() ? 'TextMessage' : 'PrivateTextMessage',
-        afterRender: $parent.checkSeen.bind($parent) } -->
+        name: $parent.isPublic() ? 'TextMessage' : 'PrivateTextMessage', afterRender: $parent.checkSeen.bind($parent) } -->
     <!-- /ko -->
     <!-- /ko --> 
 
     <!-- ko if: (isPublic() || chattingWith().connected())  -->
-    <nav class="navbar fixed-bottom navbar-dark bg-dark">
+    <nav class="navbar fixed-bottom navbar-dark bg-dark bottom-nav">
         <form id="frmMsg" data-bind="submit: sendMessage.bind($data)">    
             <input type="text" id="txtMsg" class="form-control" data-bind="textInput: message" required maxlength="250">            
         </form>
@@ -19,7 +18,7 @@
     <!-- /ko -->
 
     <!-- ko if: (isPublic() === false && chattingWith().connected() === false)  -->
-    <nav class="navbar fixed-bottom navbar-dark bg-dark">        
+    <nav class="navbar fixed-bottom navbar-dark bg-dark bottom-nav">        
         <div class="text-center" style="width: 100%">
             <p class="alert alert-danger">
                 Usuario desconectado

@@ -163,9 +163,14 @@ export class ChatTemplates {
     public scrollToFirstNotRead = () => {
         const self = this;
         let p = self.$("#mesagges p[data-msg-state=1]:first");
-        if (p.length === 0) return;
-
-        window.scrollTo(0, p.offset().top);     
+        if (p.length === 0) {
+            // if all read go to last msg;
+            self.autoScroll();
+            return;
+        }
+        
+        let marginTop = 100; //comes from css
+        window.scrollTo(0, (p.offset().top - marginTop));     
     }
 
     public autoScroll = () => {
@@ -215,31 +220,39 @@ export class ChatTemplates {
                 let scrollfn = self.isPublic() ?
                 self.autoScroll: self.scrollToFirstNotRead;
                 scrollfn();
-            }
-            self.checkSeen();
+            }            
         };
         self.$('#tabMenu a[href="#nav-chat"]').tab('show');
         self.$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             setup();
         });
         setup();
+
+        self.$(window).scroll(() => {
+            this.checkSeen();
+        });
     }
 
     public checkSeen = () => {
         const self = this;
 
-        let fn = () => self.$("#mesagges p.msgEntrante").each((i, el) => {
+        let isVissible =(p: JQuery<HTMLElement>) => {
+            let marginTop = 100; //comes from css
+            let marginBottom = self.$(".bottom-nav:first").offset().top; //comes from css
+
+            return (p.offset().top >= marginTop && p.offset().top <= marginBottom);
+            
+        };
+
+        self.$("#mesagges p.msgEntrante").each((i, el) => {
             let it = self.$(el);
-            if (it.attr("data-msg-state") === "1" && it.is(":visible")) {
+            if (it.attr("data-msg-state") === "1" && isVissible(it)) {
                 let msgData = self.ko.contextFor(el).$data;
                 
                 msgData.message.state(Status.Seen);
                 self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
             }
         });
-
-        // give time to the scroll.
-        setTimeout(fn, 500);
     }
 
     public createPrivateChat = (withId: string) => {
