@@ -25,9 +25,7 @@ jobs:
         # Generate the website
         # cp enables routes for spa blazor
         - name: Publish
-          run: dotnet publish Ro.Services.Chat/Ro.Services.Chat.csproj -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-          env: 
-            Urls: https://0.0.0.0
+          run: dotnet publish Ro.Services.Chat/Ro.Services.Chat.csproj -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}          
 
         # Publish to azure
         - name: Deploy to azure
