@@ -1,0 +1,37 @@
+name: 'Publish application'
+on: push
+
+env:
+  AZURE_WEBAPP_NAME: roserviceschat
+  AZURE_WEBAPP_PACKAGE_PATH: './published'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        # Checkout the code
+        - uses: actions/checkout@v2
+
+        # Install .NET Core SDK
+        - name: Setup .NET Core
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: 3.1.x
+
+        # Run tests
+        #- name: Test
+        #  run: dotnet test
+
+        # Generate the website
+        # cp enables routes for spa blazor
+        - name: Publish
+          run: dotnet publish Ro.Services.Chat/Ro.Services.Chat.Mvc.csproj -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+        # Publish to azure
+        - name: Deploy to azure
+          if: ${{ github.ref == 'refs/heads/master' }} # Publish only when the push is on master
+          uses: azure/webapps-deploy@v2
+          with:
+            app-name: ${{ env.AZURE_WEBAPP_NAME }}
+            publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+            package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
