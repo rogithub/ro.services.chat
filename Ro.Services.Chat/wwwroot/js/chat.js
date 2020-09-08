@@ -282,9 +282,10 @@ var ChatTemplates = /** @class */ (function () {
             var found = self.ko.utils.arrayFilter(self.privateMessages[userId](), function (it) {
                 return it.message.now === messageId;
             });
-            if (found.length > 0) {
-                found[0].message.state(state);
-            }
+            if (found.length === 0)
+                return;
+            found[0].message.state(state);
+            self.checkSeen();
         };
         this.onReceiveMessageDelivered = function (userId, messageId) {
             var self = _this;
@@ -399,6 +400,7 @@ var ChatTemplates = /** @class */ (function () {
                         self.autoScroll : self.scrollToFirstNotRead;
                     scrollfn();
                 }
+                self.checkSeen();
             };
             self.$('#tabMenu a[href="#nav-chat"]').tab('show');
             self.$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -406,14 +408,16 @@ var ChatTemplates = /** @class */ (function () {
             });
             setup();
             self.$(window).scroll(function () {
-                _this.checkSeen();
+                self.checkSeen();
             });
         };
         this.checkSeen = function () {
             var self = _this;
             var isVissible = function (p) {
                 var marginTop = 100; //comes from css
-                var marginBottom = self.$(".bottom-nav:first").offset().top; //comes from css
+                var height = p.height();
+                var marginBottom = self.$(".bottom-nav:first").offset().top - height; //comes from css
+                console.log("p heihgt " + height + " - mb: " + marginBottom + " - p top " + p.offset().top);
                 return (p.offset().top >= marginTop && p.offset().top <= marginBottom);
             };
             self.$("#mesagges p.msgEntrante").each(function (i, el) {

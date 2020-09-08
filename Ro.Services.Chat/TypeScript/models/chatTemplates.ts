@@ -81,10 +81,10 @@ export class ChatTemplates {
             return it.message.now === messageId;
         });
 
-        if (found.length > 0) {
-            found[0].message.state(state);
-        }
+        if (found.length === 0) return;
 
+        found[0].message.state(state);
+        self.checkSeen();
     }
 
     public onReceiveMessageDelivered = (userId: string, messageId: number) => {
@@ -220,7 +220,8 @@ export class ChatTemplates {
                 let scrollfn = self.isPublic() ?
                 self.autoScroll: self.scrollToFirstNotRead;
                 scrollfn();
-            }            
+            }
+            self.checkSeen();
         };
         self.$('#tabMenu a[href="#nav-chat"]').tab('show');
         self.$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -229,7 +230,7 @@ export class ChatTemplates {
         setup();
 
         self.$(window).scroll(() => {
-            this.checkSeen();
+            self.checkSeen();
         });
     }
 
@@ -238,10 +239,10 @@ export class ChatTemplates {
 
         let isVissible =(p: JQuery<HTMLElement>) => {
             let marginTop = 100; //comes from css
-            let marginBottom = self.$(".bottom-nav:first").offset().top; //comes from css
-
-            return (p.offset().top >= marginTop && p.offset().top <= marginBottom);
+            let height = p.height();
+            let marginBottom = self.$(".bottom-nav:first").offset().top - height; //comes from css
             
+            return (p.offset().top >= marginTop && p.offset().top <= marginBottom);            
         };
 
         self.$("#mesagges p.msgEntrante").each((i, el) => {
@@ -258,7 +259,7 @@ export class ChatTemplates {
     public createPrivateChat = (withId: string) => {
         const self = this;
         if (!self.privateMessages[withId]) {
-            self.privateMessages[withId] = self.ko.observableArray<MessageInfo>();
+            self.privateMessages[withId] = self.ko.observableArray<MessageInfo>();            
         }
     }
 
