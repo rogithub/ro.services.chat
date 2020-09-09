@@ -282,7 +282,7 @@ exports.ChatTemplates = void 0;
 var chatConnection_1 = __webpack_require__(12);
 var chatStateUser_1 = __webpack_require__(17);
 var status_1 = __webpack_require__(6);
-var textMessage_1 = __webpack_require__(18);
+var stateMessage_1 = __webpack_require__(18);
 var ChatTemplates = /** @class */ (function () {
     function ChatTemplates(ko, $, user, urlSignalr) {
         var _this = this;
@@ -295,7 +295,7 @@ var ChatTemplates = /** @class */ (function () {
             self.messages.push({ user: {
                     id: userId,
                     name: userName
-                }, message: new textMessage_1.TextMessage(self.ko, message) });
+                }, message: new stateMessage_1.StateMessage(self.ko, message) });
             self.autoScroll();
         };
         this.updateMessageStatus = function (userId, messageId, state) {
@@ -323,7 +323,7 @@ var ChatTemplates = /** @class */ (function () {
         this.onPrivateMessage = function (idFrom, message) {
             var self = _this;
             var userFrom = self.getUser(idFrom);
-            var txtMessage = new textMessage_1.TextMessage(self.ko, message);
+            var txtMessage = new stateMessage_1.StateMessage(self.ko, message);
             userFrom.messages.push({ user: userFrom.toUser(), message: txtMessage });
             self.scrollToFirstNotRead();
             self.chatConnection.sendMessageDelivered(idFrom, message.now);
@@ -387,11 +387,11 @@ var ChatTemplates = /** @class */ (function () {
             var msg = self.message();
             if (self.$.trim(msg).length > 0) {
                 var isPublic = self.isPublic();
-                var sentMessage_1 = textMessage_1.TextMessage.createSent(msg);
+                var sentMessage_1 = stateMessage_1.StateMessage.createSent(msg);
                 var item = { user: {
                         id: self.id(),
                         name: self.user.name
-                    }, message: new textMessage_1.TextMessage(self.ko, sentMessage_1) };
+                    }, message: new stateMessage_1.StateMessage(self.ko, sentMessage_1) };
                 var send = isPublic ? function () { return self.chatConnection.send(sentMessage_1); } : function () { return self.chatConnection.sendTo(sentMessage_1, self.chattingWith().id); };
                 var list = isPublic ? self.messages : self.chattingWith().messages;
                 send();
@@ -676,10 +676,10 @@ exports.ChatStateUser = ChatStateUser;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TextMessage = void 0;
+exports.StateMessage = void 0;
 var status_1 = __webpack_require__(6);
-var TextMessage = /** @class */ (function () {
-    function TextMessage(ko, message) {
+var StateMessage = /** @class */ (function () {
+    function StateMessage(ko, message) {
         this.ko = ko;
         this.content = message.content;
         this.now = message.now;
@@ -694,16 +694,16 @@ var TextMessage = /** @class */ (function () {
             });
         }, self);
     }
-    TextMessage.createSent = function (content) {
+    StateMessage.createSent = function (content) {
         return {
             now: Date.now(),
             content: content,
             state: status_1.Status.Sent
         };
     };
-    return TextMessage;
+    return StateMessage;
 }());
-exports.TextMessage = TextMessage;
+exports.StateMessage = StateMessage;
 
 
 /***/ }),

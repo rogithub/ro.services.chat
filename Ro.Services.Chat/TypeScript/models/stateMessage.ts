@@ -1,14 +1,14 @@
 import { Status } from "./status";
 import { Message } from "./message";
 
-export class TextMessage {
+export class StateMessage<T> {
     public now: number;
-    public content: string;
+    public content: T;
     public state: KnockoutObservable<Status>;
     public time: KnockoutComputed<string>;
     ko: KnockoutStatic;
 
-    constructor(ko: KnockoutStatic, message: Message) {
+    constructor(ko: KnockoutStatic, message: Message<T>) {
         this.ko = ko;
         this.content = message.content;
         this.now = message.now;
@@ -26,7 +26,7 @@ export class TextMessage {
         }, self);
     }
 
-    public static createSent = (content: string): Message => {
+    public static createSent = <T>(content: T): Message<T> => {
         return {
             now: Date.now(),
             content: content,

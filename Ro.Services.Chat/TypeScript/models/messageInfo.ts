@@ -1,8 +1,8 @@
 import { ChatUser } from "./chatUser";
-import { TextMessage } from "./textMessage";
+import { StateMessage } from "./stateMessage";
 
 
-export interface MessageInfo {
+export interface MessageInfo<T> {
     user: ChatUser;
-    message: TextMessage;
+    message: StateMessage<T>;
 }

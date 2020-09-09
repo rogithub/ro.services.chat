@@ -4,7 +4,7 @@ import { ChatConnection } from './chatConnection';
 import { ChatStateUser } from './chatStateUser';
 import { MessageInfo } from './messageInfo';
 import { Status } from './status';
-import { TextMessage } from './textMessage';
+import { StateMessage } from './stateMessage';
 import { Message } from './message';
 
 export class ChatTemplates {
@@ -20,7 +20,7 @@ export class ChatTemplates {
     public user: UserInfo;
     public urlSignalr: string;
     public chatConnection: ChatConnection;
-    public messages: KnockoutObservableArray<MessageInfo>;
+    public messages: KnockoutObservableArray<MessageInfo<any>>;
     public users: KnockoutObservableArray<ChatStateUser>;
     public usersFilter: KnockoutObservable<string>;
     public filteredUsers: KnockoutComputed<ChatStateUser[]>;    
@@ -34,7 +34,7 @@ export class ChatTemplates {
         this.id = ko.observable<string>("");
         this.usersFilter = ko.observable<string>("");
         this.chattingWith = ko.observable<ChatStateUser>();
-        this.messages = ko.observableArray<MessageInfo>([]);
+        this.messages = ko.observableArray<MessageInfo<any>>([]);
         this.users = ko.observableArray<ChatStateUser>([]);        
         $("#txtMsg").focus();
         const self = this;
@@ -89,12 +89,12 @@ export class ChatTemplates {
         return self.ko.utils.arrayFirst(self.users(), u=>u.id === id);
     }
 
-    public onMessage = (userId: string, userName: string, message: Message) => {
+    public onMessage = (userId: string, userName: string, message: Message<string>) => {
         const self = this;
         self.messages.push({ user: {
             id: userId,
             name: userName
-        }, message: new TextMessage(self.ko, message) });
+        }, message: new StateMessage(self.ko, message) });
         self.autoScroll();
     }
 
@@ -105,7 +105,7 @@ export class ChatTemplates {
             return;
         }
 
-        let found = self.ko.utils.arrayFilter(user.messages(), (it: MessageInfo) => {
+        let found = self.ko.utils.arrayFilter(user.messages(), (it: MessageInfo<any>) => {
             return it.message.now === messageId;
         });
 
@@ -125,12 +125,12 @@ export class ChatTemplates {
         self.updateMessageStatus(userId, messageId, Status.Seen);
     }
 
-    public onPrivateMessage = (idFrom: string, message: Message) => {
+    public onPrivateMessage = (idFrom: string, message: Message<string>) => {
         const self = this;
 
         const userFrom = self.getUser(idFrom);
  
-        let txtMessage = new TextMessage(self.ko, message);
+        let txtMessage = new StateMessage(self.ko, message);
         userFrom.messages.push({ user: userFrom.toUser(), message: txtMessage });
         self.scrollToFirstNotRead();
 
@@ -202,13 +202,13 @@ export class ChatTemplates {
 
         if (self.$.trim(msg).length > 0) {
             const isPublic = self.isPublic();
-            let sentMessage = TextMessage.createSent(msg);
-            const item: MessageInfo = { user: {
+            let sentMessage = StateMessage.createSent(msg);
+            const item: MessageInfo<any> = { user: {
                 id: self.id(),
                 name: self.user.name
-            }, message: new TextMessage(self.ko, sentMessage) };
+            }, message: new StateMessage(self.ko, sentMessage) };
             let send = isPublic ? () => self.chatConnection.send(sentMessage) : () => self.chatConnection.sendTo(sentMessage, self.chattingWith().id);
-            let list: KnockoutObservableArray<MessageInfo> = isPublic ? self.messages : self.chattingWith().messages;
+            let list: KnockoutObservableArray<MessageInfo<any>> = isPublic ? self.messages : self.chattingWith().messages;
 
             send();
             list.push(item);

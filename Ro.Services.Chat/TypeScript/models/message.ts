@@ -1,9 +1,9 @@
 import { Status } from "./status";
 
 
-export interface Message {
+export interface Message<T> {
     state: Status;
-    content: string;
+    content: T;
     now: number;
 }
 
