@@ -3,7 +3,7 @@
 <script type="text/html" id="ChatPartial">
     <div id="mesagges" class="chatcontent">
 
-    <!-- ko foreach: isPublic() ? messages() : privateMessages[chattingWith().id]() -->
+    <!-- ko foreach: isPublic() ? messages() : chattingWith().messages() -->
     <!-- ko template: { 
         name: $parent.isPublic() ? 'TextMessage' : 'PrivateTextMessage', afterRender: $parent.checkSeen.bind($parent) } -->
     <!-- /ko -->
