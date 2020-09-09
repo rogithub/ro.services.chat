@@ -1,4 +1,4 @@
-import { MessageInfo } from "./message";
+import { MessageInfo, Status } from "./message";
 
 export interface ChatUser {
     id: string;
@@ -10,6 +10,7 @@ export class ChatStateUser {
     public name: string;
     public connected: KnockoutObservable<boolean>;
     public messages: KnockoutObservableArray<MessageInfo>;
+    public unread: KnockoutComputed<number>;
     
     constructor(ko:KnockoutStatic, u: ChatUser, connected: boolean = true)
     {
@@ -17,5 +18,12 @@ export class ChatStateUser {
         this.name = u.name;
         this.connected = ko.observable<boolean>(connected);
         this.messages = ko.observableArray<MessageInfo>()
+        const self = this;
+        this.unread = ko.pureComputed<number>(() => {
+
+            return ko.utils.arrayFilter(self.messages(), 
+            m => m.message.state() === Status.Deliverded).length;
+
+        }, self);
     }
 }

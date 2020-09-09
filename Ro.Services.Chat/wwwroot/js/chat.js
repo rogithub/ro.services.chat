@@ -148,7 +148,7 @@
 /******/
 /******/
 /******/ 	// add entry module to deferred list
-/******/ 	deferredModules.push([9,1]);
+/******/ 	deferredModules.push([10,1]);
 /******/ 	// run deferred modules when ready
 /******/ 	return checkDeferredModules();
 /******/ })
@@ -160,10 +160,52 @@
 /* 3 */,
 /* 4 */,
 /* 5 */,
-/* 6 */,
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TextMessage = exports.Status = void 0;
+var Status;
+(function (Status) {
+    Status[Status["Sent"] = 0] = "Sent";
+    Status[Status["Deliverded"] = 1] = "Deliverded";
+    Status[Status["Seen"] = 2] = "Seen";
+})(Status = exports.Status || (exports.Status = {}));
+var TextMessage = /** @class */ (function () {
+    function TextMessage(ko, message) {
+        this.ko = ko;
+        this.content = message.content;
+        this.now = message.now;
+        this.state = ko.observable(message.state);
+        var self = this;
+        this.time = ko.pureComputed(function () {
+            var d = new Date(self.now);
+            return d.toLocaleTimeString('en-US', {
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }, self);
+    }
+    TextMessage.createSent = function (content) {
+        return {
+            now: Date.now(),
+            content: content,
+            state: Status.Sent
+        };
+    };
+    return TextMessage;
+}());
+exports.TextMessage = TextMessage;
+
+
+/***/ }),
 /* 7 */,
 /* 8 */,
-/* 9 */
+/* 9 */,
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -205,7 +247,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var chatTemplates_1 = __webpack_require__(10);
+var chatTemplates_1 = __webpack_require__(11);
 var binderService_1 = __webpack_require__(18);
 var jsonReq_1 = __webpack_require__(19);
 var urlBase = $("#urlBase").val();
@@ -256,16 +298,16 @@ $(function () { return __awaiter(void 0, void 0, void 0, function () {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatTemplates = void 0;
-var chatUser_1 = __webpack_require__(11);
-var chatConnection_1 = __webpack_require__(12);
-var message_1 = __webpack_require__(17);
+var chatUser_1 = __webpack_require__(12);
+var chatConnection_1 = __webpack_require__(13);
+var message_1 = __webpack_require__(6);
 var ChatTemplates = /** @class */ (function () {
     function ChatTemplates(ko, $, user, urlSignalr) {
         var _this = this;
@@ -452,13 +494,14 @@ exports.ChatTemplates = ChatTemplates;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatStateUser = void 0;
+var message_1 = __webpack_require__(6);
 var ChatStateUser = /** @class */ (function () {
     function ChatStateUser(ko, u, connected) {
         if (connected === void 0) { connected = true; }
@@ -466,6 +509,10 @@ var ChatStateUser = /** @class */ (function () {
         this.name = u.name;
         this.connected = ko.observable(connected);
         this.messages = ko.observableArray();
+        var self = this;
+        this.unread = ko.pureComputed(function () {
+            return ko.utils.arrayFilter(self.messages(), function (m) { return m.message.state() === message_1.Status.Deliverded; }).length;
+        }, self);
     }
     return ChatStateUser;
 }());
@@ -473,7 +520,7 @@ exports.ChatStateUser = ChatStateUser;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -616,52 +663,10 @@ exports.ChatConnection = ChatConnection;
 
 
 /***/ }),
-/* 13 */,
 /* 14 */,
 /* 15 */,
 /* 16 */,
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TextMessage = exports.Status = void 0;
-var Status;
-(function (Status) {
-    Status[Status["Sent"] = 0] = "Sent";
-    Status[Status["Deliverded"] = 1] = "Deliverded";
-    Status[Status["Seen"] = 2] = "Seen";
-})(Status = exports.Status || (exports.Status = {}));
-var TextMessage = /** @class */ (function () {
-    function TextMessage(ko, message) {
-        this.ko = ko;
-        this.content = message.content;
-        this.now = message.now;
-        this.state = ko.observable(message.state);
-        var self = this;
-        this.time = ko.pureComputed(function () {
-            var d = new Date(self.now);
-            return d.toLocaleTimeString('en-US', {
-                hour12: true,
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }, self);
-    }
-    TextMessage.createSent = function (content) {
-        return {
-            now: Date.now(),
-            content: content,
-            state: Status.Sent
-        };
-    };
-    return TextMessage;
-}());
-exports.TextMessage = TextMessage;
-
-
-/***/ }),
+/* 17 */,
 /* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 

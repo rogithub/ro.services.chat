@@ -461,7 +461,8 @@ var TextMessageFormat = /** @class */ (function () {
 //# sourceMappingURL=TextMessageFormat.js.map
 
 /***/ }),
-/* 6 */
+/* 6 */,
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -475,9 +476,9 @@ var TextMessageFormat = /** @class */ (function () {
 
 
 
-var base64 = __webpack_require__(14)
-var ieee754 = __webpack_require__(15)
-var isArray = __webpack_require__(16)
+var base64 = __webpack_require__(15)
+var ieee754 = __webpack_require__(16)
+var isArray = __webpack_require__(17)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2255,10 +2256,10 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(13)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(14)))
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2371,10 +2372,10 @@ var NodeHttpClient = /** @class */ (function (_super) {
 }(_HttpClient__WEBPACK_IMPORTED_MODULE_1__[/* HttpClient */ "a"]));
 
 //# sourceMappingURL=NodeHttpClient.js.map
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(6).Buffer))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(7).Buffer))
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2437,14 +2438,14 @@ var HandshakeProtocol = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=HandshakeProtocol.js.map
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(6).Buffer))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(7).Buffer))
 
 /***/ }),
-/* 9 */,
 /* 10 */,
 /* 11 */,
 /* 12 */,
-/* 13 */
+/* 13 */,
+/* 14 */
 /***/ (function(module, exports) {
 
 var g;
@@ -2470,7 +2471,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2629,7 +2630,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -2719,7 +2720,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -2730,7 +2731,6 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 17 */,
 /* 18 */,
 /* 19 */,
 /* 20 */
@@ -2766,7 +2766,7 @@ var Errors = __webpack_require__(2);
 var HttpClient = __webpack_require__(3);
 
 // EXTERNAL MODULE: ./node_modules/@microsoft/signalr/dist/esm/NodeHttpClient.js
-var NodeHttpClient = __webpack_require__(7);
+var NodeHttpClient = __webpack_require__(8);
 
 // EXTERNAL MODULE: ./node_modules/@microsoft/signalr/dist/esm/ILogger.js
 var ILogger = __webpack_require__(0);
@@ -2912,7 +2912,7 @@ var DefaultHttpClient_DefaultHttpClient = /** @class */ (function (_super) {
 
 //# sourceMappingURL=DefaultHttpClient.js.map
 // EXTERNAL MODULE: ./node_modules/@microsoft/signalr/dist/esm/HandshakeProtocol.js
-var HandshakeProtocol = __webpack_require__(8);
+var HandshakeProtocol = __webpack_require__(9);
 
 // CONCATENATED MODULE: ./node_modules/@microsoft/signalr/dist/esm/IHubProtocol.js
 // Copyright (c) .NET Foundation. All rights reserved.

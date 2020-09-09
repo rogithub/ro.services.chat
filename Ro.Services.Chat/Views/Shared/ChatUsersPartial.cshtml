@@ -20,6 +20,12 @@
                 </svg>
                     <div class="media-body ml-3">
                         <strong class="mt-0" data-bind="text: name"></strong>
+
+                        <!-- ko if: unread() > 0 -->
+                        <span class="badge badge-success"
+                        data-bind="text: unread"></span>
+                        <!-- /ko -->
+
                         <!-- ko if: connected() === false -->
                         <span>(desconectado con mensages)</span>                        
                         <!-- /ko -->
