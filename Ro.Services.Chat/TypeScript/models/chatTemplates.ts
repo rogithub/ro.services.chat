@@ -1,7 +1,11 @@
 import { UserInfo } from '../models/userInfo';
-import { ChatUser, ChatStateUser } from '../models/chatUser';
+import { ChatUser } from '../models/chatUser';
 import { ChatConnection } from './chatConnection';
-import { MessageInfo, TextMessage, Message, Status } from './message';
+import { ChatStateUser } from './chatStateUser';
+import { MessageInfo } from './messageInfo';
+import { Status } from './status';
+import { TextMessage } from './textMessage';
+import { Message } from './message';
 
 export class ChatTemplates {
 

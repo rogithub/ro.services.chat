@@ -166,39 +166,13 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TextMessage = exports.Status = void 0;
+exports.Status = void 0;
 var Status;
 (function (Status) {
     Status[Status["Sent"] = 0] = "Sent";
     Status[Status["Deliverded"] = 1] = "Deliverded";
     Status[Status["Seen"] = 2] = "Seen";
 })(Status = exports.Status || (exports.Status = {}));
-var TextMessage = /** @class */ (function () {
-    function TextMessage(ko, message) {
-        this.ko = ko;
-        this.content = message.content;
-        this.now = message.now;
-        this.state = ko.observable(message.state);
-        var self = this;
-        this.time = ko.pureComputed(function () {
-            var d = new Date(self.now);
-            return d.toLocaleTimeString('en-US', {
-                hour12: true,
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }, self);
-    }
-    TextMessage.createSent = function (content) {
-        return {
-            now: Date.now(),
-            content: content,
-            state: Status.Sent
-        };
-    };
-    return TextMessage;
-}());
-exports.TextMessage = TextMessage;
 
 
 /***/ }),
@@ -248,8 +222,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var chatTemplates_1 = __webpack_require__(11);
-var binderService_1 = __webpack_require__(18);
-var jsonReq_1 = __webpack_require__(19);
+var binderService_1 = __webpack_require__(19);
+var jsonReq_1 = __webpack_require__(20);
 var urlBase = $("#urlBase").val();
 var urlHome = $("#urlHome").val();
 var urlSignalr = urlBase + "/chathub";
@@ -305,9 +279,10 @@ $(function () { return __awaiter(void 0, void 0, void 0, function () {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatTemplates = void 0;
-var chatUser_1 = __webpack_require__(12);
-var chatConnection_1 = __webpack_require__(13);
-var message_1 = __webpack_require__(6);
+var chatConnection_1 = __webpack_require__(12);
+var chatStateUser_1 = __webpack_require__(17);
+var status_1 = __webpack_require__(6);
+var textMessage_1 = __webpack_require__(18);
 var ChatTemplates = /** @class */ (function () {
     function ChatTemplates(ko, $, user, urlSignalr) {
         var _this = this;
@@ -320,7 +295,7 @@ var ChatTemplates = /** @class */ (function () {
             self.messages.push({ user: {
                     id: userId,
                     name: userName
-                }, message: new message_1.TextMessage(self.ko, message) });
+                }, message: new textMessage_1.TextMessage(self.ko, message) });
             self.autoScroll();
         };
         this.updateMessageStatus = function (userId, messageId, state) {
@@ -339,20 +314,20 @@ var ChatTemplates = /** @class */ (function () {
         };
         this.onReceiveMessageDelivered = function (userId, messageId) {
             var self = _this;
-            self.updateMessageStatus(userId, messageId, message_1.Status.Deliverded);
+            self.updateMessageStatus(userId, messageId, status_1.Status.Deliverded);
         };
         this.onReceiveMessageSeen = function (userId, messageId) {
             var self = _this;
-            self.updateMessageStatus(userId, messageId, message_1.Status.Seen);
+            self.updateMessageStatus(userId, messageId, status_1.Status.Seen);
         };
         this.onPrivateMessage = function (idFrom, message) {
             var self = _this;
             var userFrom = self.getUser(idFrom);
-            var txtMessage = new message_1.TextMessage(self.ko, message);
+            var txtMessage = new textMessage_1.TextMessage(self.ko, message);
             userFrom.messages.push({ user: userFrom.toUser(), message: txtMessage });
             self.scrollToFirstNotRead();
             self.chatConnection.sendMessageDelivered(idFrom, message.now);
-            self.updateMessageStatus(idFrom, message.now, message_1.Status.Deliverded);
+            self.updateMessageStatus(idFrom, message.now, status_1.Status.Deliverded);
         };
         this.onStarted = function (id) {
             var self = _this;
@@ -385,7 +360,7 @@ var ChatTemplates = /** @class */ (function () {
             var others = self.ko.utils.arrayFilter(list, function (u) { return u.id !== self.id(); });
             for (var _a = 0, others_1 = others; _a < others_1.length; _a++) {
                 var u = others_1[_a];
-                self.users.push(new chatUser_1.ChatStateUser(self.ko, u));
+                self.users.push(new chatStateUser_1.ChatStateUser(self.ko, u));
             }
         };
         this.scrollToFirstNotRead = function () {
@@ -412,11 +387,11 @@ var ChatTemplates = /** @class */ (function () {
             var msg = self.message();
             if (self.$.trim(msg).length > 0) {
                 var isPublic = self.isPublic();
-                var sentMessage_1 = message_1.TextMessage.createSent(msg);
+                var sentMessage_1 = textMessage_1.TextMessage.createSent(msg);
                 var item = { user: {
                         id: self.id(),
                         name: self.user.name
-                    }, message: new message_1.TextMessage(self.ko, sentMessage_1) };
+                    }, message: new textMessage_1.TextMessage(self.ko, sentMessage_1) };
                 var send = isPublic ? function () { return self.chatConnection.send(sentMessage_1); } : function () { return self.chatConnection.sendTo(sentMessage_1, self.chattingWith().id); };
                 var list = isPublic ? self.messages : self.chattingWith().messages;
                 send();
@@ -464,7 +439,7 @@ var ChatTemplates = /** @class */ (function () {
                 var it = self.$(el);
                 if (it.attr("data-msg-state") === "1" && isVissible(it)) {
                     var msgData = self.ko.contextFor(el).$data;
-                    msgData.message.state(message_1.Status.Seen);
+                    msgData.message.state(status_1.Status.Seen);
                     self.chatConnection.sendMessageSeen(self.chattingWith().id, msgData.message.now);
                 }
             });
@@ -492,7 +467,7 @@ var ChatTemplates = /** @class */ (function () {
                     var m = _c[_b];
                     if (m.user.id === self.id())
                         continue;
-                    if (m.message.state() !== message_1.Status.Deliverded)
+                    if (m.message.state() !== status_1.Status.Deliverded)
                         continue;
                     return true;
                 }
@@ -515,40 +490,6 @@ exports.ChatTemplates = ChatTemplates;
 
 /***/ }),
 /* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChatStateUser = void 0;
-var message_1 = __webpack_require__(6);
-var ChatStateUser = /** @class */ (function () {
-    function ChatStateUser(ko, u, connected) {
-        var _this = this;
-        if (connected === void 0) { connected = true; }
-        this.toUser = function () {
-            var self = _this;
-            return {
-                id: self.id,
-                name: self.name
-            };
-        };
-        this.id = u.id;
-        this.name = u.name;
-        this.connected = ko.observable(connected);
-        this.messages = ko.observableArray();
-        var self = this;
-        this.unread = ko.pureComputed(function () {
-            return ko.utils.arrayFilter(self.messages(), function (m) { return m.message.state() === message_1.Status.Deliverded; });
-        }, self);
-    }
-    return ChatStateUser;
-}());
-exports.ChatStateUser = ChatStateUser;
-
-
-/***/ }),
-/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -591,7 +532,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatConnection = void 0;
-var signalR = __webpack_require__(20);
+var signalR = __webpack_require__(21);
 var ChatConnection = /** @class */ (function () {
     function ChatConnection(user, urlSignalr, onMessage, onPrivateMessage, onReceiveMessageDelivered, onReceiveMessageSeen, onUserListChange, onStarted) {
         var _this = this;
@@ -691,11 +632,82 @@ exports.ChatConnection = ChatConnection;
 
 
 /***/ }),
+/* 13 */,
 /* 14 */,
 /* 15 */,
 /* 16 */,
-/* 17 */,
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChatStateUser = void 0;
+var status_1 = __webpack_require__(6);
+var ChatStateUser = /** @class */ (function () {
+    function ChatStateUser(ko, u, connected) {
+        var _this = this;
+        if (connected === void 0) { connected = true; }
+        this.toUser = function () {
+            var self = _this;
+            return {
+                id: self.id,
+                name: self.name
+            };
+        };
+        this.id = u.id;
+        this.name = u.name;
+        this.connected = ko.observable(connected);
+        this.messages = ko.observableArray();
+        var self = this;
+        this.unread = ko.pureComputed(function () {
+            return ko.utils.arrayFilter(self.messages(), function (m) { return m.message.state() === status_1.Status.Deliverded; });
+        }, self);
+    }
+    return ChatStateUser;
+}());
+exports.ChatStateUser = ChatStateUser;
+
+
+/***/ }),
 /* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TextMessage = void 0;
+var status_1 = __webpack_require__(6);
+var TextMessage = /** @class */ (function () {
+    function TextMessage(ko, message) {
+        this.ko = ko;
+        this.content = message.content;
+        this.now = message.now;
+        this.state = ko.observable(message.state);
+        var self = this;
+        this.time = ko.pureComputed(function () {
+            var d = new Date(self.now);
+            return d.toLocaleTimeString('en-US', {
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }, self);
+    }
+    TextMessage.createSent = function (content) {
+        return {
+            now: Date.now(),
+            content: content,
+            state: status_1.Status.Sent
+        };
+    };
+    return TextMessage;
+}());
+exports.TextMessage = TextMessage;
+
+
+/***/ }),
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -730,7 +742,7 @@ exports.BinderService = BinderService;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
