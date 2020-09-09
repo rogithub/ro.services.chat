@@ -12,7 +12,7 @@ export class ChatConnection {
     constructor(
         user: UserInfo,
         urlSignalr: string,
-        onMessage: (user: string, message: Message) => void,
+        onMessage: (userId: string, userName: string, message: Message) => void,
         onPrivateMessage: (id: string, message: Message) => void,
         onReceiveMessageDelivered: (userId: string, messageId: number) => void,
         onReceiveMessageSeen: (userId: string, messageId: number) => void,

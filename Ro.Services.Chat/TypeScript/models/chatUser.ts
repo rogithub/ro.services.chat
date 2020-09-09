@@ -10,7 +10,7 @@ export class ChatStateUser {
     public name: string;
     public connected: KnockoutObservable<boolean>;
     public messages: KnockoutObservableArray<MessageInfo>;
-    public unread: KnockoutComputed<number>;
+    public unread: KnockoutComputed<MessageInfo[]>;
     
     constructor(ko:KnockoutStatic, u: ChatUser, connected: boolean = true)
     {
@@ -19,11 +19,19 @@ export class ChatStateUser {
         this.connected = ko.observable<boolean>(connected);
         this.messages = ko.observableArray<MessageInfo>()
         const self = this;
-        this.unread = ko.pureComputed<number>(() => {
+        this.unread = ko.pureComputed<MessageInfo[]>(() => {
 
             return ko.utils.arrayFilter(self.messages(), 
-            m => m.message.state() === Status.Deliverded).length;
+            m => m.message.state() === Status.Deliverded);
 
         }, self);
+    }
+
+    public toUser = (): ChatUser => {
+        const self = this;
+        return {
+            id: self.id,
+            name: self.name
+        };
     }
 }

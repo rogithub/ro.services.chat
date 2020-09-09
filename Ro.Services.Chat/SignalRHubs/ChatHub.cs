@@ -42,7 +42,7 @@ namespace Ro.Services.Chat.SignalRHubs
 
         public async Task SendMessage(UserInfo user, TextMessage message)
         {
-            await Clients.OthersInGroup(user.Group).SendAsync("ReceiveMessage", user.Name, message);
+            await Clients.OthersInGroup(user.Group).SendAsync("ReceiveMessage", Context.ConnectionId, user.Name, message);
         }
 
         public async Task SendMessageTo(string id, TextMessage message)

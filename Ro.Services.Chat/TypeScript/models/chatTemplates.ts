@@ -66,9 +66,12 @@ export class ChatTemplates {
         return self.ko.utils.arrayFirst(self.users(), u=>u.id === id);
     }
 
-    public onMessage = (user: string, message: Message) => {
+    public onMessage = (userId: string, userName: string, message: Message) => {
         const self = this;
-        self.messages.push({ user, message: new TextMessage(self.ko, message), isLocal: false });
+        self.messages.push({ user: {
+            id: userId,
+            name: userName
+        }, message: new TextMessage(self.ko, message) });
         self.autoScroll();
     }
 
@@ -105,7 +108,7 @@ export class ChatTemplates {
         const userFrom = self.getUser(idFrom);
  
         let txtMessage = new TextMessage(self.ko, message);
-        userFrom.messages.push({ user: userFrom.name, message: txtMessage, isLocal: false });
+        userFrom.messages.push({ user: userFrom.toUser(), message: txtMessage });
         self.scrollToFirstNotRead();
 
         self.chatConnection.sendMessageDelivered(idFrom, message.now);
@@ -177,7 +180,10 @@ export class ChatTemplates {
         if (self.$.trim(msg).length > 0) {
             const isPublic = self.isPublic();
             let sentMessage = TextMessage.createSent(msg);
-            const item: MessageInfo = { user: self.user.name, message: new TextMessage(self.ko, sentMessage), isLocal: true };
+            const item: MessageInfo = { user: {
+                id: self.id(),
+                name: self.user.name
+            }, message: new TextMessage(self.ko, sentMessage) };
             let send = isPublic ? () => self.chatConnection.send(sentMessage) : () => self.chatConnection.sendTo(sentMessage, self.chattingWith().id);
             let list: KnockoutObservableArray<MessageInfo> = isPublic ? self.messages : self.chattingWith().messages;
 

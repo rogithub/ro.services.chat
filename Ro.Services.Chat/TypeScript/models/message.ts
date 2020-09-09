@@ -1,3 +1,5 @@
+import { ChatUser } from "./chatUser";
+
 export enum Status {
     Sent,
     Deliverded,
@@ -11,9 +13,8 @@ export interface Message {
 }
 
 export interface MessageInfo {
-    user: string;
+    user: ChatUser;
     message: TextMessage;
-    isLocal: boolean;
 }
 
 export class TextMessage {
