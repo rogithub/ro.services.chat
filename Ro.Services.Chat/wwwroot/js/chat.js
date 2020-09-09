@@ -485,6 +485,20 @@ var ChatTemplates = /** @class */ (function () {
         this.isPublic = ko.pureComputed(function () {
             return (self.chattingWith() === null || self.chattingWith() === undefined);
         }, self);
+        this.hasUnread = ko.pureComputed(function () {
+            for (var _i = 0, _a = self.users(); _i < _a.length; _i++) {
+                var u = _a[_i];
+                for (var _b = 0, _c = u.messages(); _b < _c.length; _b++) {
+                    var m = _c[_b];
+                    if (m.user.id === self.id())
+                        continue;
+                    if (m.message.state() !== message_1.Status.Deliverded)
+                        continue;
+                    return true;
+                }
+            }
+            return false;
+        }, self);
         this.filteredUsers = ko.pureComputed(function () {
             if (self.usersFilter() === null ||
                 self.usersFilter() === undefined ||

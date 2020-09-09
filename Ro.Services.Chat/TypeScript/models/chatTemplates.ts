@@ -9,6 +9,8 @@ export class ChatTemplates {
     public id: KnockoutObservable<string>;
     public chattingWith: KnockoutObservable<ChatStateUser>;
     public isPublic: KnockoutComputed<boolean>;
+    public hasUnread: KnockoutComputed<boolean>;
+
     public $: JQueryStatic;
     public ko: KnockoutStatic;
     public user: UserInfo;
@@ -43,6 +45,23 @@ export class ChatTemplates {
 
         this.isPublic = ko.pureComputed<boolean>(() => {
             return (self.chattingWith() === null || self.chattingWith() === undefined);
+        }, self);
+
+        this.hasUnread = ko.pureComputed<boolean>(() => {
+            for (let u of self.users())
+            {
+                for(let m of u.messages())
+                {
+                    if (m.user.id === self.id()) continue;
+
+                    if (m.message.state() !== Status.Deliverded) continue;
+
+                    return true;
+                }
+            }
+
+            return false;
+            
         }, self);
 
         this.filteredUsers = ko.pureComputed<ChatStateUser[]>(() => {
