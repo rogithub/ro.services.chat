@@ -20,8 +20,22 @@
     margin-bottom: 10px;
 }
 
-form#frmMsg {
+#frmMsg {
     width: 100%;
+}
+
+#frmMsg .image-upload {
+    cursor: pointer;
+    position: absolute;
+    bottom: 3px;
+    right: 20px;
+}
+#frmMsg .image-upload:hover {
+    color: blue;
+}
+
+#txtMsg {
+    display: inline-block;
 }
 
 .msgSaliente {
